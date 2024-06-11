@@ -26,14 +26,9 @@
         </activity>
         <activity
             android:name=".Splash"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+           </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -51,8 +46,14 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".MainActivity"
-            android:exported="false"
+            android:exported="true"
             android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="androidx.compose.material3:material3" />

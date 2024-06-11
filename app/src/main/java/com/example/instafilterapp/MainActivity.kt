@@ -45,6 +45,15 @@ class MainActivity : AppCompatActivity() {
         mImageButton = findViewById(R.id.toggle_button)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+        val btnGrid: ImageButton = findViewById(R.id.btnGrid)
+        btnGrid.setOnClickListener {
+            val gridOverlay: View = findViewById(R.id.gridOverlay)
+            if (gridOverlay.visibility == View.VISIBLE) {
+                gridOverlay.visibility = View.GONE
+            } else {
+                gridOverlay.visibility = View.VISIBLE
+            }
+        }
 
         mImageButton.setOnClickListener {
             toggleFlash()
@@ -71,9 +80,8 @@ class MainActivity : AppCompatActivity() {
         galleryButton.setOnClickListener { openGallery() }
 
         val cardView1: MaterialCardView = findViewById(R.id.card_view_1)
-        val cardView2: MaterialCardView = findViewById(R.id.card_view_2)
-        val cardView3: MaterialCardView = findViewById(R.id.card_view_3)
-        val cardView4: MaterialCardView = findViewById(R.id.card_view_4)
+
+
 
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {

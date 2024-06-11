@@ -9,8 +9,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
+import com.github.furkankaplan.fkblurview.FKBlurView
+
 
 class DisplayImageActivity : AppCompatActivity() {
 
@@ -24,6 +24,8 @@ class DisplayImageActivity : AppCompatActivity() {
         imageView = findViewById(R.id.image_view)
 
         val arrowButton: ImageButton = findViewById(R.id.arrow_button)
+//        val blurView = findViewById<FKBlurView>(R.id.glass)
+//        blurView.setBlur(this,blurView)
 
         // Establecer OnClickListener para el botón
         arrowButton.setOnClickListener {
@@ -33,30 +35,30 @@ class DisplayImageActivity : AppCompatActivity() {
         }
 
         val detailedCardView: CardView = findViewById(R.id.detailed_card_view)
-        val btnGlass: MaterialButton = findViewById(R.id.btn_glass)
+//        val btnGlass: MaterialButton = findViewById(R.id.btn_glass)
         val horizontalScrollView: HorizontalScrollView = findViewById(R.id.horizontal_scroll_view)
 
-        btnGlass.setOnClickListener {
-            isScrollViewVisible = !isScrollViewVisible
-            horizontalScrollView.visibility = if (isScrollViewVisible) View.VISIBLE else View.GONE
-            detailedCardView.visibility = if (isScrollViewVisible) View.GONE else View.VISIBLE
-        }
+//        btnGlass.setOnClickListener {
+//            isScrollViewVisible = !isScrollViewVisible
+//            horizontalScrollView.visibility = if (isScrollViewVisible) View.VISIBLE else View.GONE
+//            detailedCardView.visibility = if (isScrollViewVisible) View.GONE else View.VISIBLE
+//        }
 
         // Handling MaterialCardView clicks
-        val cardView1: MaterialCardView = findViewById(R.id.card_view_1)
-        val cardView2: MaterialCardView = findViewById(R.id.card_view_2)
-        val cardView3: MaterialCardView = findViewById(R.id.card_view_3)
-        val cardView4: MaterialCardView = findViewById(R.id.card_view_4)
+//        val cardView1: MaterialCardView = findViewById(R.id.card_view_1)
+//        val cardView2: MaterialCardView = findViewById(R.id.card_view_2)
+//        val cardView3: MaterialCardView = findViewById(R.id.card_view_3)
+//        val cardView4: MaterialCardView = findViewById(R.id.card_view_4)
 
-        val onClickListener = View.OnClickListener {
-            horizontalScrollView.visibility = View.GONE
-            detailedCardView.visibility = View.VISIBLE
-        }
+//        val onClickListener = View.OnClickListener {
+//            horizontalScrollView.visibility = View.GONE
+//            detailedCardView.visibility = View.VISIBLE
+//        }
 
-        cardView1.setOnClickListener(onClickListener)
-        cardView2.setOnClickListener(onClickListener)
-        cardView3.setOnClickListener(onClickListener)
-        cardView4.setOnClickListener(onClickListener)
+//        cardView1.setOnClickListener(onClickListener)
+//        cardView2.setOnClickListener(onClickListener)
+//        cardView3.setOnClickListener(onClickListener)
+//        cardView4.setOnClickListener(onClickListener)
 
         // Obtener la URI de la imagen desde el Intent
         val imageUri: Uri? = intent.getParcelableExtra("imageUri")
