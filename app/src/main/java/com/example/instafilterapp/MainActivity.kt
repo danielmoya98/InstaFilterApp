@@ -1,9 +1,12 @@
 package com.example.instafilterapp
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -11,26 +14,43 @@ import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.cardview.widget.CardView
+import com.example.instafilterapp.databinding.ActivityMainBinding
+import com.example.proyectopdi.OpenUtils
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import org.opencv.android.OpenCVLoader
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var viewBinding: ActivityMainBinding
 
-    private val CAMERA_PERMISSION_CODE = 100
-    private val PICK_IMAGE_REQUEST = 101
 
-    private lateinit var imageCapture: ImageCapture
+
+    private var imageCapture: ImageCapture? = null
+    private var videoCapture: VideoCapture<Recorder>? = null
+    private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
+    private var imageAnalysis: ImageAnalysis? = null
+    private var openUtils = OpenUtils()
+
+
+
+
     private lateinit var mImageButton: ImageButton
     private var isScrollViewVisible = false
     private var isFlashOn = false
@@ -38,13 +58,31 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
 
-        val previewView: PreviewView = findViewById(R.id.camera_preview)
+
+        if (allPermissionsGranted()) {
+            startCamera()
+        } else {
+            ActivityCompat.requestPermissions(
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+        }
+
         val captureButton: MaterialButton = findViewById(R.id.btn_capture)
+
         mImageButton = findViewById(R.id.toggle_button)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        if(OpenCVLoader.initLocal()) {
+            Toast.makeText(this, "load", Toast.LENGTH_SHORT).show()
+        }
+        else {
+            Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show()
+        }
+
+
         val btnGrid: ImageButton = findViewById(R.id.btnGrid)
         btnGrid.setOnClickListener {
             val gridOverlay: View = findViewById(R.id.gridOverlay)
@@ -60,13 +98,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         val rotateCameraButton: ImageButton = findViewById(R.id.rotar_camara)
+
         rotateCameraButton.setOnClickListener {
             lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
                 CameraSelector.LENS_FACING_FRONT
             } else {
                 CameraSelector.LENS_FACING_BACK
             }
-            startCamera(previewView)
+            startCamera()
         }
 
         captureButton.setOnClickListener {
@@ -81,69 +120,88 @@ class MainActivity : AppCompatActivity() {
 
         val cardView1: MaterialCardView = findViewById(R.id.card_view_1)
 
-
-
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE)
-        } else {
-            startCamera(previewView)
-        }
     }
 
-    private fun startCamera(previewView: PreviewView) {
+    @OptIn(ExperimentalGetImage::class)
+    private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder()
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            imageCapture = ImageCapture.Builder().build()
+
+            imageAnalysis = ImageAnalysis.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
+                    it.setAnalyzer(cameraExecutor) { image ->
+                        val bitmap: Bitmap? = BitmapUtils.getBitmap(image)
+
+
+
+
+                        runOnUiThread {
+                            if (bitmap != null) {
+                                var newBitmap = openUtils.applySepia(bitmap)
+
+                                viewBinding.viewImage.setImageBitmap(newBitmap)
+
+                                // Aquí guardamos el bitmap con el filtro aplicado en una variable global
+                                filteredBitmap = newBitmap
+                            } else {
+                                Log.e(TAG, "Grayscale bitmap is null")
+                            }
+                        }
+                        image.close()
+                    }
                 }
 
-            imageCapture = ImageCapture.Builder().apply {
-                setFlashMode(if (isFlashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
-            }.build()
-
-            val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
+            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                cameraProvider.bindToLifecycle(
+                    this, cameraSelector, imageAnalysis, imageCapture)
             } catch (exc: Exception) {
-                Log.e("CameraX", "Error al iniciar la cámara: ${exc.message}")
+                Log.e(TAG, "Fallo al vincular casos de uso", exc)
             }
         }, ContextCompat.getMainExecutor(this))
-        updateFlashIcon()
     }
 
+    private var filteredBitmap: Bitmap? = null
+
     private fun takePhoto() {
-        val photoFile = File(externalMediaDirs.firstOrNull(), "${System.currentTimeMillis()}.jpg")
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+        val bitmapToSave = filteredBitmap ?: return
 
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e("CameraX", "Error al tomar la foto: ${exc.message}", exc)
-                }
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+            .format(System.currentTimeMillis())
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+            }
+        }
 
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val intent = Intent(this@MainActivity, DisplayImageActivity::class.java)
-                    intent.putExtra("imageUri", savedUri)
-                    startActivity(intent)
-                }
-            })
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            val outputStream = contentResolver.openOutputStream(it)
+            if (outputStream != null) {
+                bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            }
+            outputStream?.close()
+
+            val msg = "Photo capture succeeded: $it"
+            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+            Log.d(TAG, msg)
+        }
     }
 
     private fun toggleFlash() {
-        if (this::imageCapture.isInitialized) {
+        imageCapture?.let {
             isFlashOn = !isFlashOn
             Log.d("CameraX", "Flash toggled, isFlashOn: $isFlashOn")
-            imageCapture.flashMode = if (isFlashOn) {
+            it.flashMode = if (isFlashOn) {
                 ImageCapture.FLASH_MODE_ON
             } else {
                 ImageCapture.FLASH_MODE_OFF
@@ -163,33 +221,48 @@ class MainActivity : AppCompatActivity() {
 
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+        startActivityForResult(intent, 101)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            val selectedImage = data.data
-            val intent = Intent(this@MainActivity, DisplayImageActivity::class.java)
-            intent.putExtra("imageUri", selectedImage)
-            startActivity(intent)
-        }
-    }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                val previewView: PreviewView = findViewById(R.id.camera_preview)
-                startCamera(previewView)
-            } else {
-                Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
-            }
-        }
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(
+            baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+    }
+
+    companion object {
+        private const val TAG = "CameraXApp"
+        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS =
+            mutableListOf (
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+            ).apply {
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                }
+            }.toTypedArray()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>, grantResults:
+        IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                startCamera()
+            } else {
+                Toast.makeText(this,
+                    "Permissions not granted by the user.",
+                    Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 }
