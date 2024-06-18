@@ -78,6 +78,26 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_view_2"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="10dp"
+                    android:clickable="true"
+                    android:onClick="onCardClicked"
+                    app:cardCornerRadius="75dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
+                    tools:ignore="SpeakableTextPresentCheck">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/f1"
+                        tools:ignore="ContentDescription" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
 
                     android:layout_width="70dp"
                     android:layout_height="70dp"

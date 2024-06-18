@@ -1,8 +1,11 @@
 package com.example.proyectopdi
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.camera.core.ImageProxy
+import com.example.instafilterapp.R
 import org.opencv.android.Utils
 import org.opencv.core.Core
 import org.opencv.core.CvType
@@ -786,5 +789,89 @@ class OpenUtils {
         result.release()
 
         return resultBitmap
+    }
+
+    fun cambiarColorIris(bitmap: Bitmap, eyeCascade: CascadeClassifier): Bitmap {
+        var mat = Mat()
+        Utils.bitmapToMat(bitmap, mat)
+        mat = IrisColorChange(mat, eyeCascade)
+
+        Utils.matToBitmap(mat, bitmap)
+        return bitmap
+    }
+
+    private fun IrisColorChange(mat: Mat, eyeCascade: CascadeClassifier): Mat {
+        val mRgb = Mat()
+        Imgproc.cvtColor(mat, mRgb, Imgproc.COLOR_RGBA2RGB)
+
+        val height = mRgb.height()
+        val absoluteEyeSize: Double = height * 0.05
+
+        val eyes = MatOfRect()
+        if (eyeCascade != null) {
+            eyeCascade.detectMultiScale(mRgb, eyes, 1.1, 2, 2, Size(absoluteEyeSize, absoluteEyeSize), Size())
+        }
+
+        val eyesArray: Array<Rect> = eyes.toArray()
+        for (i in eyesArray.indices) {
+            val eyeRect = eyesArray[i]
+            val eyeROI = mat.submat(eyeRect)
+
+            val center = Point(eyeROI.cols() / 2.0, eyeROI.rows() / 2.0)
+            val radius = Math.min(eyeROI.cols(), eyeROI.rows()) / 4.0
+
+            Imgproc.circle(eyeROI, center, radius.toInt(), Scalar(0.0, 0.0, 255.0), -1)
+        }
+
+        return mat
+    }
+    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
+        // Convertir bitmap a Mat y cambiar a BGRA para manejar alfa desde el principio
+        val mat = Mat().apply {
+            Utils.bitmapToMat(bitmap, this)
+            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+        }
+
+        // Cargar el filtro de perrito y convertirlo directamente a BGRA
+        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+        val dogMat = Mat().apply {
+            Utils.bitmapToMat(dogBitmap, this)
+            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+        }
+
+        // Detección de rostros en BGRA
+        val faces = MatOfRect()
+        cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
+        val facesArray = faces.toArray()
+
+        // Aplicar filtro a cada cara detectada
+        facesArray.forEach { face ->
+            val dogResized = Mat()
+            Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
+
+            val offsetX = (0.35 * face.width).toInt()
+            val offsetY = (0.375 * face.height).toInt()
+            val startX = face.x - offsetX
+            val startY = face.y - offsetY
+
+            for (i in 0 until dogResized.rows()) {
+                for (j in 0 until dogResized.cols()) {
+                    val pixel = dogResized.get(i, j)
+                    if (pixel[3] > 20) { // Solo píxeles suficientemente opacos
+                        val x = startX + j
+                        val y = startY + i
+                        if (y in 0 until mat.rows() && x in 0 until mat.cols()) {
+                            mat.put(y, x, pixel[0], pixel[1], pixel[2], pixel[3]) // Incluir canal alfa
+                        }
+                    }
+                }
+            }
+        }
+
+        // Convertir de vuelta a Bitmap y asegurar el formato RGBA para la UI
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2RGB)
+        Utils.matToBitmap(mat, bitmap)
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
+        return bitmap
     }
 }

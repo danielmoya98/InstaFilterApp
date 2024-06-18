@@ -2,6 +2,7 @@ package com.example.instafilterapp
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -29,8 +30,13 @@ import com.example.instafilterapp.databinding.ActivityMainBinding
 import com.example.proyectopdi.OpenUtils
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import org.opencv.android.NativeCameraView
 import org.opencv.android.OpenCVLoader
+import org.opencv.objdetect.CascadeClassifier
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -49,12 +55,17 @@ class MainActivity : AppCompatActivity() {
     private var openUtils = OpenUtils()
 
 
-
+    private lateinit var cascadeClassifier: CascadeClassifier
+    private lateinit var cascadeClassifier1: CascadeClassifier
+    private lateinit var cascadeClassifier_eye: CascadeClassifier
 
     private lateinit var mImageButton: ImageButton
     private var isScrollViewVisible = false
     private var isFlashOn = false
     private var lensFacing = CameraSelector.LENS_FACING_BACK
+
+    private var filtroNum: Int = 0
+    private var rotar = CameraSelector.DEFAULT_FRONT_CAMERA
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,10 +111,10 @@ class MainActivity : AppCompatActivity() {
         val rotateCameraButton: ImageButton = findViewById(R.id.rotar_camara)
 
         rotateCameraButton.setOnClickListener {
-            lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
-                CameraSelector.LENS_FACING_FRONT
+            if (rotar == CameraSelector.DEFAULT_FRONT_CAMERA) {
+                rotar = CameraSelector.DEFAULT_BACK_CAMERA
             } else {
-                CameraSelector.LENS_FACING_BACK
+                rotar = CameraSelector.DEFAULT_FRONT_CAMERA
             }
             startCamera()
         }
@@ -120,6 +131,73 @@ class MainActivity : AppCompatActivity() {
 
         val cardView1: MaterialCardView = findViewById(R.id.card_view_1)
 
+
+
+
+
+        try {
+            val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_alt)
+            val cascadeDir: File = getDir("cascade", Context.MODE_PRIVATE)
+            val mCascadeFile: File = File(cascadeDir, "haarcascade_frontalface_alt.xml")
+            val os: FileOutputStream = FileOutputStream(mCascadeFile)
+            val buffer: ByteArray = ByteArray(4096)
+            var byteRead: Int
+            while (inputStream.read(buffer).also { byteRead = it } != -1) {
+                os.write(buffer, 0, byteRead)
+            }
+            inputStream.close()
+            os.close()
+
+            cascadeClassifier = CascadeClassifier(mCascadeFile.absolutePath)
+        }
+        catch (e: IOException){
+            Log.i(NativeCameraView.TAG, "Cascade file not found")
+        }
+
+
+        try {
+            val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_default)
+            val file: File = File(getDir("cascade", Context.MODE_PRIVATE), "haarcascade_frontalface_default.xml")
+            val fileOutputStream: FileOutputStream = FileOutputStream(file)
+
+            val data: ByteArray = ByteArray(4096)
+
+            var read_bytes: Int
+
+            while (inputStream.read(data).also { read_bytes = it } != -1) {
+                fileOutputStream.write(data, 0, read_bytes)
+            }
+            cascadeClassifier1 = CascadeClassifier(file.absolutePath)
+
+
+            inputStream.close()
+            fileOutputStream.close()
+            file.delete()
+
+
+        }
+        catch (e: IOException){
+            Log.i(NativeCameraView.TAG, "Cascade file not found")
+        }
+
+        try {
+            val inputStream2: InputStream = resources.openRawResource(R.raw.haarcascade_eye)
+            val cascadeDir: File = getDir("cascade", Context.MODE_PRIVATE)
+            val mCascadeFile_eye: File = File(cascadeDir, "haarcascade_eye.xml")
+            val os2: FileOutputStream = FileOutputStream(mCascadeFile_eye)
+            val buffer1: ByteArray = ByteArray(4096)
+            var byteRead1: Int
+            while (inputStream2.read(buffer1).also { byteRead1 = it } != -1) {
+                os2.write(buffer1, 0, byteRead1)
+            }
+            inputStream2.close()
+            os2.close()
+
+            cascadeClassifier_eye = CascadeClassifier(mCascadeFile_eye.absolutePath)
+        }
+        catch (e: IOException){
+            Log.i(NativeCameraView.TAG, "Cascade file not found")
+        }
     }
 
     @OptIn(ExperimentalGetImage::class)
@@ -142,7 +220,25 @@ class MainActivity : AppCompatActivity() {
 
                         runOnUiThread {
                             if (bitmap != null) {
-                                var newBitmap = openUtils.applySepia(bitmap)
+                                var newBitmap = when (filtroNum) {
+                                    1 -> openUtils.applyDogFilter(bitmap, cascadeClassifier,this)
+                                    2 -> openUtils.variableThreshold(bitmap!!)
+                                    3 -> openUtils.detectEdges(bitmap)
+                                    4 -> openUtils.detectFace(bitmap, cascadeClassifier)
+                                    5 -> openUtils.detectFaceEye(bitmap, cascadeClassifier, cascadeClassifier_eye)
+                                    6 -> openUtils.cannyFiltro(bitmap)
+                                    7 -> openUtils.applyPixelize(bitmap)
+                                    8 -> openUtils.applyPosterize(bitmap)
+                                    9 -> openUtils.applyZoom(bitmap)
+                                    10 -> openUtils.applySepia(bitmap)
+                                    11 -> openUtils.applySobel(bitmap)
+                                    12 -> openUtils.cerradura(bitmap)
+                                    13 -> openUtils.processImage(bitmap)
+                                    14 -> openUtils.blurBackground(bitmap, cascadeClassifier1)
+                                    15 -> openUtils.cambiarColorIris(bitmap, cascadeClassifier_eye)
+                                    16 -> openUtils.cannyFiltroBlanco(bitmap)
+                                    else -> bitmap
+                                }
 
                                 viewBinding.viewImage.setImageBitmap(newBitmap)
 
@@ -156,7 +252,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            val cameraSelector = rotar
 
             try {
                 cameraProvider.unbindAll()
@@ -281,8 +377,8 @@ class MainActivity : AppCompatActivity() {
 
     fun onCardClicked(view: View) {
         when (view.id) {
-            R.id.card_view_1 -> showToast("Filtro 1 seleccionado")
-
+            R.id.card_view_1 -> filtroNum = 7
+            R.id.card_view_2 -> filtroNum = 1
 
         }
     }
