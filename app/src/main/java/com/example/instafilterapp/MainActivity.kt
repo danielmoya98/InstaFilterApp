@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
@@ -60,7 +61,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mImageButton: ImageButton
     private var isScrollViewVisible = false
+
+
+    private var contadorActivo = false
+
     private var isFlashOn = false
+
+
+
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private lateinit var horizontalScrollView: HorizontalScrollView
     private var filtroNum: Int = 0
@@ -110,7 +118,12 @@ class MainActivity : AppCompatActivity() {
         clockButton = findViewById(R.id.clock)
 
         clockButton.setOnClickListener {
-            startCountdownAnimation()
+            if(contadorActivo == false){
+                contadorActivo = true
+            }
+            else{
+                contadorActivo = false
+            }
         }
 
         mImageButton.setOnClickListener {
@@ -129,7 +142,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         captureButton.setOnClickListener {
-            takePhoto()
+            if(contadorActivo == false){
+                takePhoto()
+            }
+            else{
+                startCountdownAnimation()
+                contarTresSegundos()
+            }
         }
 
         val galleryButton: ImageButton = findViewById(R.id.gallery_button)
@@ -368,8 +387,15 @@ class MainActivity : AppCompatActivity() {
 
     fun onCardClicked(view: View) {
         when (view.id) {
-            R.id.card_view_1 -> filtroNum = 7 // Cambia el filtro según sea necesario
-            R.id.card_view_2 -> filtroNum = 1 // Cambia el filtro según sea necesario
+            R.id.card_view_1 -> filtroNum = 0
+            R.id.card_view_2 -> filtroNum = 16
+            R.id.card_view_3 -> filtroNum = 6
+            R.id.card_view_4 -> filtroNum = 7
+            R.id.card_view_5 -> filtroNum = 8
+            R.id.card_view_6 -> filtroNum = 10
+            R.id.card_view_7 -> filtroNum = 11
+            R.id.card_view_8 -> filtroNum = 4
+            R.id.card_view_9 -> filtroNum = 1
         }
     }
 
@@ -432,5 +458,18 @@ class MainActivity : AppCompatActivity() {
             // Ocultar el TextView cuando el conteo regresivo termina
             contadorTextView.visibility = View.INVISIBLE
         }
+    }
+    private fun contarTresSegundos() {
+        // Inicializar el contador con 3 segundos (3000 milisegundos)
+        object : CountDownTimer(3000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                // Actualiza el UI con el tiempo restante si lo necesitas
+            }
+
+            override fun onFinish() {
+                // Cuando el contador termine, toma la foto
+                takePhoto()
+            }
+        }.start()
     }
 }

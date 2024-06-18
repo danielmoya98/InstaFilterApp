@@ -825,53 +825,280 @@ class OpenUtils {
 
         return mat
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
+//        // Convertir bitmap a Mat y cambiar a BGRA para manejar alfa desde el principio
+//        val mat = Mat().apply {
+//            Utils.bitmapToMat(bitmap, this)
+//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+//        }
+//
+//        // Cargar el filtro de perrito y convertirlo directamente a BGRA
+//        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+//        val dogMat = Mat().apply {
+//            Utils.bitmapToMat(dogBitmap, this)
+//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+//        }
+//
+//        // Detección de rostros en BGRA
+//        val faces = MatOfRect()
+//        cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
+//        val facesArray = faces.toArray()
+//
+//        // Aplicar filtro a cada cara detectada
+//        facesArray.forEach { face ->
+//            val dogResized = Mat()
+//            Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
+//
+//            val offsetX = (0.35 * face.width).toInt()
+//            val offsetY = (0.375 * face.height).toInt()
+//            val startX = face.x - offsetX
+//            val startY = face.y - offsetY
+//
+//            for (i in 0 until dogResized.rows()) {
+//                for (j in 0 until dogResized.cols()) {
+//                    val pixel = dogResized.get(i, j)
+//                    if (pixel[3] > 20) { // Solo píxeles suficientemente opacos
+//                        val x = startX + j
+//                        val y = startY + i
+//                        if (y in 0 until mat.rows() && x in 0 until mat.cols()) {
+//                            mat.put(y, x, pixel[0], pixel[1], pixel[2], pixel[3]) // Incluir canal alfa
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Convertir de vuelta a Bitmap y asegurar el formato RGBA para la UI
+//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2RGB)
+//        Utils.matToBitmap(mat, bitmap)
+//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
+//        return bitmap
+//    }
+
+
+
+//    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
+//        // Convertir bitmap a Mat y cambiar a BGRA para manejar alfa desde el principio
+//        val mat = Mat().apply {
+//            Utils.bitmapToMat(bitmap, this)
+//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+//        }
+//
+//        // Cargar el filtro de perrito y convertirlo directamente a BGRA
+//        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+//        val dogMat = Mat().apply {
+//            Utils.bitmapToMat(dogBitmap, this)
+//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+//        }
+//
+//        // Detección de rostros en BGRA
+//        val faces = MatOfRect()
+//        cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
+//        val facesArray = faces.toArray()
+//
+//        // Aplicar filtro a cada cara detectada
+//        facesArray.forEach { face ->
+//            val dogResized = Mat()
+//            Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
+//
+//            val offsetX = (0.35 * face.width).toInt()
+//            val offsetY = (0.375 * face.height).toInt()
+//            val startX = maxOf(face.x - offsetX, 0)
+//            val startY = maxOf(face.y - offsetY, 0)
+//
+//            val roi = mat.submat(Rect(startX, startY, minOf(dogResized.cols(), mat.cols() - startX), minOf(dogResized.rows(), mat.rows() - startY)))
+//
+//            // Crear una máscara a partir del canal alfa del filtro
+//            val dogMask = Mat()
+//            Core.extractChannel(dogResized, dogMask, 3)
+//
+//            // Invertir la máscara
+//            val dogMaskInv = Mat()
+//            Core.bitwise_not(dogMask, dogMaskInv)
+//
+//            // Aplicar la máscara invertida a la ROI del fondo
+//            val background = Mat()
+//            Core.bitwise_and(roi, roi, background, dogMaskInv)
+//
+//            // Aplicar la máscara del filtro al filtro
+//            val foreground = Mat()
+//            Core.bitwise_and(dogResized, dogResized, foreground, dogMask)
+//
+//            // Sumar el fondo y el filtro
+//            val combined = Mat()
+//            Core.add(background, foreground, combined)
+//
+//            // Copiar el resultado de vuelta a la imagen original
+//            combined.copyTo(roi)
+//        }
+//
+//        // Convertir de vuelta a Bitmap y asegurar el formato RGBA para la UI
+//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
+//        Utils.matToBitmap(mat, bitmap)
+//        return bitmap
+//    }
+
+//    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
+//        // Convertir bitmap a Mat y cambiar a BGRA para manejar alfa desde el principio
+//        val mat = Mat().apply {
+//            Utils.bitmapToMat(bitmap, this)
+//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+//        }
+//
+//        // Cargar el filtro de perrito y convertirlo directamente a BGRA
+//        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+//        val dogMat = Mat().apply {
+//            Utils.bitmapToMat(dogBitmap, this)
+//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+//        }
+//
+//        // Detección de rostros en BGRA
+//        val faces = MatOfRect()
+//        cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
+//        val facesArray = faces.toArray()
+//
+//        // Aplicar filtro a cada cara detectada
+//        facesArray.forEach { face ->
+//            val dogResized = Mat()
+//            Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
+//
+//            val offsetX = (0.35 * face.width).toInt()
+//            val offsetY = (0.375 * face.height).toInt()
+//            val startX = maxOf(face.x - offsetX, 0)
+//            val startY = maxOf(face.y - offsetY, 0)
+//
+//            val endX = minOf(startX + dogResized.cols(), mat.cols())
+//            val endY = minOf(startY + dogResized.rows(), mat.rows())
+//
+//            val width = endX - startX
+//            val height = endY - startY
+//
+//            if (width > 0 && height > 0) {
+//                val roi = mat.submat(Rect(startX, startY, width, height))
+//                val dogRegion = dogResized.submat(Rect(0, 0, width, height))
+//
+//                // Crear una máscara a partir del canal alfa del filtro
+//                val dogMask = Mat()
+//                Core.extractChannel(dogRegion, dogMask, 3)
+//
+//                // Invertir la máscara
+//                val dogMaskInv = Mat()
+//                Core.bitwise_not(dogMask, dogMaskInv)
+//
+//                // Aplicar la máscara invertida a la ROI del fondo
+//                val background = Mat(roi.size(), roi.type())
+//                roi.copyTo(background, dogMaskInv)
+//
+//                // Aplicar la máscara del filtro al filtro
+//                val foreground = Mat(dogRegion.size(), dogRegion.type())
+//                dogRegion.copyTo(foreground, dogMask)
+//
+//                // Sumar el fondo y el filtro
+//                Core.add(background, foreground, roi)
+//            }
+//        }
+//
+//        // Convertir de vuelta a Bitmap y asegurar el formato RGBA para la UI
+//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
+//        Utils.matToBitmap(mat, bitmap)
+//        return bitmap
+//    }
+//fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
+//    val mat = Mat()
+//    Utils.bitmapToMat(bitmap, mat)
+//    Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2BGRA)
+//
+//    val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+//    val dogMat = Mat()
+//    Utils.bitmapToMat(dogBitmap, dogMat)
+//    Imgproc.cvtColor(dogMat, dogMat, Imgproc.COLOR_RGBA2BGRA)
+//
+//    val faces = MatOfRect()
+//    cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
+//    val facesArray = faces.toArray()
+//
+//    val dogResized = Mat()
+//    facesArray.forEach { face ->
+//        Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
+//
+//        val offsetX = (0.35 * face.width).toInt()
+//        val offsetY = (0.375 * face.height).toInt()
+//        val startX = face.x - offsetX
+//        val startY = face.y - offsetY
+//
+//        for (i in 0 until dogResized.rows()) {
+//            for (j in 0 until dogResized.cols()) {
+//                val pixel = dogResized.get(i, j)
+//                if (pixel[3] > 20) {
+//                    val x = startX + j
+//                    val y = startY + i
+//                    if (y in 0 until mat.rows() && x in 0 until mat.cols()) {
+//                        mat.put(y, x, pixel[0], pixel[1], pixel[2], pixel[3])
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
+//    Utils.matToBitmap(mat, bitmap)
+//    return bitmap
+//}
+
     fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
-        // Convertir bitmap a Mat y cambiar a BGRA para manejar alfa desde el principio
-        val mat = Mat().apply {
-            Utils.bitmapToMat(bitmap, this)
-            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
-        }
-
-        // Cargar el filtro de perrito y convertirlo directamente a BGRA
-        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
-        val dogMat = Mat().apply {
-            Utils.bitmapToMat(dogBitmap, this)
-            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
-        }
-
-        // Detección de rostros en BGRA
-        val faces = MatOfRect()
-        cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
-        val facesArray = faces.toArray()
-
-        // Aplicar filtro a cada cara detectada
-        facesArray.forEach { face ->
-            val dogResized = Mat()
-            Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
-
-            val offsetX = (0.35 * face.width).toInt()
-            val offsetY = (0.375 * face.height).toInt()
-            val startX = face.x - offsetX
-            val startY = face.y - offsetY
-
-            for (i in 0 until dogResized.rows()) {
-                for (j in 0 until dogResized.cols()) {
-                    val pixel = dogResized.get(i, j)
-                    if (pixel[3] > 20) { // Solo píxeles suficientemente opacos
-                        val x = startX + j
-                        val y = startY + i
-                        if (y in 0 until mat.rows() && x in 0 until mat.cols()) {
-                            mat.put(y, x, pixel[0], pixel[1], pixel[2], pixel[3]) // Incluir canal alfa
-                        }
-                    }
-                }
-            }
-        }
-
-        // Convertir de vuelta a Bitmap y asegurar el formato RGBA para la UI
-        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2RGB)
+        var mat = Mat()
+        Utils.bitmapToMat(bitmap, mat)
+        mat = CascadeRecado(mat, cascadeClassifier, context)
         Utils.matToBitmap(mat, bitmap)
-        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
         return bitmap
     }
+
+    private fun CascadeRecado(mat: Mat, cascadeClassifier: CascadeClassifier, context: Context): Mat {
+        val mRgb = Mat()
+        Imgproc.cvtColor(mat, mRgb, Imgproc.COLOR_RGBA2RGB)
+
+        val height = mRgb.height()
+        var absoluteFaceSize: Double = height * 0.1
+
+        var faces: MatOfRect = MatOfRect()
+        if(cascadeClassifier != null) {
+            cascadeClassifier.detectMultiScale(mRgb, faces, 1.1, 2, 2, Size(absoluteFaceSize, absoluteFaceSize), Size())
+        }
+
+        val facesArray: Array<Rect> = faces.toArray()
+        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+        val dogMat = Mat()
+        Utils.bitmapToMat(dogBitmap, dogMat)
+        Imgproc.cvtColor(dogMat, dogMat, Imgproc.COLOR_RGBA2RGB)
+
+        for(i in facesArray.indices) {
+            val face = facesArray[i]
+            val dogResized = Mat()
+            Imgproc.resize(dogMat, dogResized, Size(face.width.toDouble(), face.height.toDouble()))
+
+            dogResized.copyTo(mat.submat(face))
+        }
+
+        return mat
+    }
+
+
 }
