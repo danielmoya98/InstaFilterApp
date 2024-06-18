@@ -5,13 +5,206 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="top"
+        android:gravity="center"
+        android:orientation="horizontal"
+        tools:ignore="RtlHardcoded">
+
+        <ImageButton
+            android:id="@+id/arrow_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="25dp"
+            android:background="@drawable/arrow"
+            android:importantForAccessibility="no"
+            android:rotation="180"
+            android:backgroundTint="@color/black"
+            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
+
+        </ImageButton>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+        </Space>
+
+        <ImageButton
+            android:id="@+id/download_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/download"
+            android:importantForAccessibility="no"
+            android:backgroundTint="@color/black"
+            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
+
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/share_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/share_24dp_fill0_wght400_grad0_opsz24"
+            android:importantForAccessibility="no"
+            android:backgroundTint="@color/black"
+            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
+
+        </ImageButton>
+
+    </LinearLayout>
+
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/cambiar_altura"
+        android:background="@color/transparent"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_crop"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cambiar_altura"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+
+        app:cardBackgroundColor="@android:color/black"
+        app:cardCornerRadius="16dp">
+
+        <SeekBar
+            android:id="@+id/seekBar_crop"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:max="100"
+            android:tickMark="@color/white" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_filters"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cambiar_altura"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+
+        app:cardBackgroundColor="@android:color/black"
+        app:cardCornerRadius="16dp">
+
+        <SeekBar
+            android:id="@+id/seekBar_filters"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:max="100"
+            android:tickMark="@color/white" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_rotate"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cambiar_altura"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+
+        android:visibility="gone"
+        app:cardBackgroundColor="@android:color/black"
+        app:cardCornerRadius="16dp">
+
+        <SeekBar
+            android:id="@+id/seekBar_rotate"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:max="360"
+            android:tickMark="@color/white" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_brightness"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cambiar_altura"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+
+        android:visibility="gone"
+        app:cardBackgroundColor="@android:color/black"
+        app:cardCornerRadius="16dp">
+
+        <SeekBar
+            android:id="@+id/seekBar_brightness"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:max="100"
+            android:tickMark="@color/white"
+            app:tint="@color/black" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_raw"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cambiar_altura"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+
+        android:visibility="gone"
+        app:cardBackgroundColor="@android:color/black"
+        app:cardCornerRadius="16dp">
+
+        <SeekBar
+            android:id="@+id/seekBar_raw"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:max="100"
+            android:tickMark="@color/white" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_balance"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/cambiar_altura"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@android:color/black"
+        app:cardCornerRadius="16dp"
+        app:tint="@color/black">
+
+        <com.example.rulerview.RulerView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            app:backgroundColor="@android:color/black"
+            app:longTickHeight="50dp"
+            app:pointerColor="@android:color/holo_blue_light"
+            app:shortTickHeight="25dp"
+            app:tickColor="@android:color/white"
+            app:tickSpacing="18dp" />
+
+        <SeekBar
+            android:id="@+id/seekBar_balance"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:max="100"
+            android:tickMark="@color/white" />
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:id="@+id/cambiar_altura"
@@ -19,6 +212,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
+
 
         <HorizontalScrollView
             android:id="@+id/horizontal_scroll_view"
@@ -30,15 +224,45 @@
             tools:ignore="SpeakableTextPresentCheck">
 
             <LinearLayout
-                android:id="@+id/linear_layout"
+                android:id="@+id/linear_layout2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:gravity="center_horizontal|center_vertical"
                 android:orientation="horizontal"
+
+                app:tint="@color/black"
                 tools:ignore="VisualLintBounds">
 
                 <LinearLayout
+                    android:id="@+id/ll_crop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="75dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/rounded_button"
+                        android:importantForAccessibility="no"
+                        android:padding="5dp"
+                        android:src="@drawable/grid"
+                        app:tint="@color/black"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Crop"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_filters"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="25dp"
@@ -46,111 +270,133 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/grid"
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/rounded_button"
                         android:importantForAccessibility="no"
+                        android:padding="5dp"
+                        android:src="@drawable/glass"
+                        app:tint="@color/black"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Crop"
+                        android:layout_marginTop="10dp"
+                        android:text="Filtros"
                         android:textColor="@color/white"
-                        android:textSize="13sp" />
+                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/ll_rotate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/rounded_button"
+                        android:importantForAccessibility="no"
+                        android:padding="5dp"
+                        android:src="@drawable/flip_camera_android_24dp_fill0_wght400_grad0_opsz24"
+                        app:tint="@color/black"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Rotar"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        app:tint="@color/black" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_brightness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
                     android:layout_marginEnd="25dp"
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/flip_camera_android_24dp_fill0_wght400_grad0_opsz24"
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/rounded_button"
                         android:importantForAccessibility="no"
-
+                        android:padding="5dp"
+                        android:src="@drawable/grid"
+                        app:tint="@color/black"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rotate"
+                        android:layout_marginTop="10dp"
+                        android:text="Brillo"
                         android:textColor="@color/white"
-                        android:textSize="13sp" />
+                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/ll_raw"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/rounded_button"
+                        android:importantForAccessibility="no"
+                        android:padding="5dp"
+                        android:src="@drawable/grid"
+                        app:tint="@color/black"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Raw"
+                        android:textColor="@color/white"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
                     android:layout_marginEnd="25dp"
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/glass"
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/rounded_button"
                         android:importantForAccessibility="no"
+                        android:padding="5dp"
+                        android:src="@drawable/grid"
+                        app:tint="@color/black"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Filter"
+                        android:layout_marginTop="10dp"
+                        android:text="Balance"
                         android:textColor="@color/white"
-                        android:textSize="13sp" />
+                        android:textSize="15sp" />
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="25dp"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/stylus_note_24dp_fill0_wght400_grad0_opsz24"
-                        android:importantForAccessibility="no"
-                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Edit"
-                        android:textColor="@color/white"
-                        android:textSize="13sp" />
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="25dp"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:background="@drawable/download"
-                        android:importantForAccessibility="no"
-                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Save"
-                        android:textColor="@color/white"
-                        android:textSize="13sp" />
-                </LinearLayout>
-
 
             </LinearLayout>
         </HorizontalScrollView>
@@ -160,8 +406,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/black"
-            android:visibility="visible"
-            app:cardElevation="4dp">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -171,31 +416,32 @@
                 android:orientation="horizontal"
                 tools:ignore="RtlHardcoded">
 
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                </Space>
+
                 <ImageButton
-                    android:id="@+id/arrow_button"
+                    android:id="@+id/up"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_marginStart="25dp"
                     android:background="@drawable/arrow"
                     android:importantForAccessibility="no"
-                    android:rotation="180"
-                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"></ImageButton>
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1">
-
-                </Space>
-
-                <ImageButton
-                    android:id="@+id/download_button"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:background="@drawable/download"
-                    android:importantForAccessibility="no"
+                    android:rotation="270"
                     tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
+                <ImageButton
+                    android:id="@+id/down"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/arrow"
+                    android:importantForAccessibility="no"
+                    android:rotation="90"
+                    android:visibility="gone"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                 <Space
                     android:layout_width="0dp"
@@ -203,20 +449,12 @@
                     android:layout_weight="1">
 
                 </Space>
-
-                <ImageButton
-                    android:id="@+id/share_button"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="25dp"
-                    android:background="@drawable/share_24dp_fill0_wght400_grad0_opsz24"
-                    android:importantForAccessibility="no"
-                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck"></ImageButton>
 
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
 
     </LinearLayout>
 

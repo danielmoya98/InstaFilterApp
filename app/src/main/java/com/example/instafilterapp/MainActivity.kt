@@ -224,7 +224,6 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, 101)
     }
 
-
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it) == PackageManager.PERMISSION_GRANTED
@@ -265,4 +264,32 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 101 && resultCode == RESULT_OK) {
+            val selectedImageUri: Uri? = data?.data
+            if (selectedImageUri != null) {
+                val intent = Intent(this, DisplayImageActivity::class.java)
+                intent.putExtra("imageUri", selectedImageUri.toString())
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun onCardClicked(view: View) {
+        when (view.id) {
+            R.id.card_view_1 -> showToast("Filtro 1 seleccionado")
+
+
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+
 }

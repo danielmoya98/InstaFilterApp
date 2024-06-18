@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RulerView">
+        <attr name="tickSpacing" format="dimension"/>
+        <attr name="longTickHeight" format="dimension"/>
+        <attr name="shortTickHeight" format="dimension"/>
+        <attr name="tickColor" format="color"/>
+        <attr name="backgroundColor" format="color"/>
+        <attr name="pointerColor" format="color"/> <!-- Nuevo atributo -->
+    </declare-styleable>
+</resources>

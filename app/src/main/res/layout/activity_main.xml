@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="0dp"
+    android:background="@color/black"
     tools:context=".MainActivity">
 
     <!--    <androidx.camera.view.PreviewView-->
@@ -61,10 +62,12 @@
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:layout_marginStart="830dp"
-                    android:layout_marginEnd="10dp"
+                    android:clickable="true"
+                    android:onClick="onCardClicked"
                     app:cardCornerRadius="75dp"
                     app:cardElevation="4dp"
-                    app:strokeWidth="0dp">
+                    app:strokeWidth="0dp"
+                    tools:ignore="SpeakableTextPresentCheck">
 
                     <ImageView
                         android:layout_width="match_parent"

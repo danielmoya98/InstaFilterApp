@@ -16,14 +16,74 @@ class DisplayImageActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
     private var isScrollViewVisible = false
+    private lateinit var cardViewCrop: CardView
+    private lateinit var cardViewFilters: CardView
+    private lateinit var cardViewRotate: CardView
+    private lateinit var cardViewBrightness: CardView
+    private lateinit var cardViewRaw: CardView
+    private lateinit var cardViewBalance: CardView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_image)
 
         imageView = findViewById(R.id.image_view)
+        // Inicializar CardViews
+        cardViewCrop = findViewById(R.id.card_view_crop)
+        cardViewFilters = findViewById(R.id.card_view_filters)
+        cardViewRotate = findViewById(R.id.card_view_rotate)
+        cardViewBrightness = findViewById(R.id.card_view_brightness)
+        cardViewRaw = findViewById(R.id.card_view_raw)
+        cardViewBalance = findViewById(R.id.card_view_balance)
+
+        // Inicializar LinearLayouts
+        val llCrop: LinearLayout = findViewById(R.id.ll_crop)
+        val llFilters: LinearLayout = findViewById(R.id.ll_filters)
+        val llRotate: LinearLayout = findViewById(R.id.ll_rotate)
+        val llBrightness: LinearLayout = findViewById(R.id.ll_brightness)
+        val llRaw: LinearLayout = findViewById(R.id.ll_raw)
+        val llBalance: LinearLayout = findViewById(R.id.ll_balance)
 
         val arrowButton: ImageButton = findViewById(R.id.arrow_button)
+        val upButton: ImageButton = findViewById(R.id.up)
+        val horizontalScrollView: HorizontalScrollView = findViewById(R.id.horizontal_scroll_view)
+        val downButton: ImageButton = findViewById(R.id.down)
+
+        llCrop.setOnClickListener {
+            toggleCardView(cardViewCrop)
+        }
+
+        llFilters.setOnClickListener {
+            toggleCardView(cardViewFilters)
+        }
+
+        llRotate.setOnClickListener {
+            toggleCardView(cardViewRotate)
+        }
+
+        llBrightness.setOnClickListener {
+            toggleCardView(cardViewBrightness)
+        }
+
+        llRaw.setOnClickListener {
+            toggleCardView(cardViewRaw)
+        }
+
+        llBalance.setOnClickListener {
+            toggleCardView(cardViewBalance)
+        }
+
+        upButton.setOnClickListener {
+            upButton.visibility = View.GONE
+            downButton.visibility = View.VISIBLE
+            horizontalScrollView.visibility = View.VISIBLE
+        }
+
+        downButton.setOnClickListener {
+            downButton.visibility = View.GONE
+            upButton.visibility = View.VISIBLE
+            horizontalScrollView.visibility = View.GONE
+        }
 //        val blurView = findViewById<FKBlurView>(R.id.glass)
 //        blurView.setBlur(this,blurView)
 
@@ -36,7 +96,7 @@ class DisplayImageActivity : AppCompatActivity() {
 
         val detailedCardView: CardView = findViewById(R.id.detailed_card_view)
 //        val btnGlass: MaterialButton = findViewById(R.id.btn_glass)
-        val horizontalScrollView: HorizontalScrollView = findViewById(R.id.horizontal_scroll_view)
+
 
 //        btnGlass.setOnClickListener {
 //            isScrollViewVisible = !isScrollViewVisible
@@ -60,9 +120,14 @@ class DisplayImageActivity : AppCompatActivity() {
 //        cardView3.setOnClickListener(onClickListener)
 //        cardView4.setOnClickListener(onClickListener)
 
-        // Obtener la URI de la imagen desde el Intent
-        val imageUri: Uri? = intent.getParcelableExtra("imageUri")
-        imageUri?.let { imageView.setImageURI(it) }
+        val imageUri: String? = intent.getStringExtra("imageUri")
+
+        if (imageUri != null) {
+            val uri = Uri.parse(imageUri)
+            imageView.setImageURI(uri)
+        } else {
+            Toast.makeText(this, "No image to display", Toast.LENGTH_SHORT).show()
+        }
 
         // Agregar funcionalidad al botón de descarga
         val context: Context = this
@@ -86,4 +151,23 @@ class DisplayImageActivity : AppCompatActivity() {
             ImageUtils.shareImageFromGallery(this@DisplayImageActivity, imagePath)
         }
     }
+
+    private fun toggleCardView(cardView: CardView) {
+        if (cardView.visibility == View.VISIBLE) {
+            cardView.visibility = View.GONE
+        } else {
+            hideAllCardViews()
+            cardView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideAllCardViews() {
+        cardViewCrop.visibility = View.GONE
+        cardViewFilters.visibility = View.GONE
+        cardViewRotate.visibility = View.GONE
+        cardViewBrightness.visibility = View.GONE
+        cardViewRaw.visibility = View.GONE
+        cardViewBalance.visibility = View.GONE
+    }
+
 }
