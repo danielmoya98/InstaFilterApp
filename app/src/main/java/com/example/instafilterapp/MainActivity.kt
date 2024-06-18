@@ -12,8 +12,10 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
@@ -45,15 +47,12 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
 
-
-
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
     private var imageAnalysis: ImageAnalysis? = null
     private var openUtils = OpenUtils()
-
 
     private lateinit var cascadeClassifier: CascadeClassifier
     private lateinit var cascadeClassifier1: CascadeClassifier
@@ -63,15 +62,18 @@ class MainActivity : AppCompatActivity() {
     private var isScrollViewVisible = false
     private var isFlashOn = false
     private var lensFacing = CameraSelector.LENS_FACING_BACK
-
+    private lateinit var horizontalScrollView: HorizontalScrollView
     private var filtroNum: Int = 0
     private var rotar = CameraSelector.DEFAULT_FRONT_CAMERA
+
+    private lateinit var contadorTextView: TextView
+    private lateinit var clockButton: ImageButton
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -82,17 +84,17 @@ class MainActivity : AppCompatActivity() {
 
         val captureButton: MaterialButton = findViewById(R.id.btn_capture)
 
+
+
         mImageButton = findViewById(R.id.toggle_button)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        if(OpenCVLoader.initLocal()) {
+        if (OpenCVLoader.initLocal()) {
             Toast.makeText(this, "load", Toast.LENGTH_SHORT).show()
-        }
-        else {
+        } else {
             Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show()
         }
-
 
         val btnGrid: ImageButton = findViewById(R.id.btnGrid)
         btnGrid.setOnClickListener {
@@ -102,6 +104,13 @@ class MainActivity : AppCompatActivity() {
             } else {
                 gridOverlay.visibility = View.VISIBLE
             }
+        }
+
+        contadorTextView = findViewById(R.id.contador)
+        clockButton = findViewById(R.id.clock)
+
+        clockButton.setOnClickListener {
+            startCountdownAnimation()
         }
 
         mImageButton.setOnClickListener {
@@ -123,17 +132,8 @@ class MainActivity : AppCompatActivity() {
             takePhoto()
         }
 
-        val horizontalScrollView: HorizontalScrollView = findViewById(R.id.horizontal_scroll_view)
-
-
         val galleryButton: ImageButton = findViewById(R.id.gallery_button)
         galleryButton.setOnClickListener { openGallery() }
-
-        val cardView1: MaterialCardView = findViewById(R.id.card_view_1)
-
-
-
-
 
         try {
             val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_alt)
@@ -149,11 +149,9 @@ class MainActivity : AppCompatActivity() {
             os.close()
 
             cascadeClassifier = CascadeClassifier(mCascadeFile.absolutePath)
-        }
-        catch (e: IOException){
+        } catch (e: IOException) {
             Log.i(NativeCameraView.TAG, "Cascade file not found")
         }
-
 
         try {
             val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_default)
@@ -169,14 +167,11 @@ class MainActivity : AppCompatActivity() {
             }
             cascadeClassifier1 = CascadeClassifier(file.absolutePath)
 
-
             inputStream.close()
             fileOutputStream.close()
             file.delete()
 
-
-        }
-        catch (e: IOException){
+        } catch (e: IOException) {
             Log.i(NativeCameraView.TAG, "Cascade file not found")
         }
 
@@ -194,8 +189,7 @@ class MainActivity : AppCompatActivity() {
             os2.close()
 
             cascadeClassifier_eye = CascadeClassifier(mCascadeFile_eye.absolutePath)
-        }
-        catch (e: IOException){
+        } catch (e: IOException) {
             Log.i(NativeCameraView.TAG, "Cascade file not found")
         }
     }
@@ -215,13 +209,10 @@ class MainActivity : AppCompatActivity() {
                     it.setAnalyzer(cameraExecutor) { image ->
                         val bitmap: Bitmap? = BitmapUtils.getBitmap(image)
 
-
-
-
                         runOnUiThread {
                             if (bitmap != null) {
                                 var newBitmap = when (filtroNum) {
-                                    1 -> openUtils.applyDogFilter(bitmap, cascadeClassifier,this)
+                                    1 -> openUtils.applyDogFilter(bitmap, cascadeClassifier, this)
                                     2 -> openUtils.variableThreshold(bitmap!!)
                                     3 -> openUtils.detectEdges(bitmap)
                                     4 -> openUtils.detectFace(bitmap, cascadeClassifier)
@@ -242,10 +233,10 @@ class MainActivity : AppCompatActivity() {
 
                                 viewBinding.viewImage.setImageBitmap(newBitmap)
 
-                                // Aquí guardamos el bitmap con el filtro aplicado en una variable global
+                                // Guardamos el bitmap con el filtro aplicado en una variable global
                                 filteredBitmap = newBitmap
                             } else {
-                                Log.e(TAG, "Grayscale bitmap is null")
+                                Log.e(TAG, "El bitmap es nulo")
                             }
                         }
                         image.close()
@@ -259,7 +250,7 @@ class MainActivity : AppCompatActivity() {
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, imageAnalysis, imageCapture)
             } catch (exc: Exception) {
-                Log.e(TAG, "Fallo al vincular casos de uso", exc)
+                Log.e(TAG, "Error al vincular casos de uso", exc)
             }
         }, ContextCompat.getMainExecutor(this))
     }
@@ -287,7 +278,7 @@ class MainActivity : AppCompatActivity() {
             }
             outputStream?.close()
 
-            val msg = "Photo capture succeeded: $it"
+            val msg = "Captura de foto exitosa: $it"
             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
             Log.d(TAG, msg)
         }
@@ -296,7 +287,7 @@ class MainActivity : AppCompatActivity() {
     private fun toggleFlash() {
         imageCapture?.let {
             isFlashOn = !isFlashOn
-            Log.d("CameraX", "Flash toggled, isFlashOn: $isFlashOn")
+            Log.d("CameraX", "Flash cambiado, isFlashOn: $isFlashOn")
             it.flashMode = if (isFlashOn) {
                 ImageCapture.FLASH_MODE_ON
             } else {
@@ -335,7 +326,7 @@ class MainActivity : AppCompatActivity() {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS =
-            mutableListOf (
+            mutableListOf(
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO
             ).apply {
@@ -354,7 +345,7 @@ class MainActivity : AppCompatActivity() {
                 startCamera()
             } else {
                 Toast.makeText(this,
-                    "Permissions not granted by the user.",
+                    "Permisos no concedidos por el usuario.",
                     Toast.LENGTH_SHORT).show()
                 finish()
             }
@@ -370,22 +361,76 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("imageUri", selectedImageUri.toString())
                 startActivity(intent)
             } else {
-                Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "No se ha seleccionado ninguna imagen", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     fun onCardClicked(view: View) {
         when (view.id) {
-            R.id.card_view_1 -> filtroNum = 7
-            R.id.card_view_2 -> filtroNum = 1
-
+            R.id.card_view_1 -> filtroNum = 7 // Cambia el filtro según sea necesario
+            R.id.card_view_2 -> filtroNum = 1 // Cambia el filtro según sea necesario
         }
     }
+
+
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
 
+    private fun startCountdownAnimation() {
+        var count = 3
+        contadorTextView.text = count.toString()
+        contadorTextView.visibility = View.VISIBLE
+
+        // Animación fade in
+        val fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        fadeInAnimation.setAnimationListener(object : android.view.animation.Animation.AnimationListener {
+            override fun onAnimationStart(animation: android.view.animation.Animation?) {
+                // No es necesario implementar este método
+            }
+
+            override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                // Lógica para iniciar el conteo regresivo
+                countdown(count)
+            }
+
+            override fun onAnimationRepeat(animation: android.view.animation.Animation?) {
+                // No es necesario implementar este método
+            }
+        })
+        contadorTextView.startAnimation(fadeInAnimation)
+    }
+
+    private fun countdown(count: Int) {
+        var currentCount = count
+
+        if (currentCount > 0) {
+            // Actualizar el texto del contador
+            contadorTextView.text = currentCount.toString()
+
+            // Animación fade out
+            val fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
+            fadeOutAnimation.setAnimationListener(object : android.view.animation.Animation.AnimationListener {
+                override fun onAnimationStart(animation: android.view.animation.Animation?) {
+                    // No es necesario implementar este método
+                }
+
+                override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                    // Llamar recursivamente para el siguiente número
+                    countdown(currentCount - 1)
+                }
+
+                override fun onAnimationRepeat(animation: android.view.animation.Animation?) {
+                    // No es necesario implementar este método
+                }
+            })
+            contadorTextView.startAnimation(fadeOutAnimation)
+        } else {
+            // Ocultar el TextView cuando el conteo regresivo termina
+            contadorTextView.visibility = View.INVISIBLE
+        }
+    }
 }

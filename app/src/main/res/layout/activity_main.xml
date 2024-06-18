@@ -22,6 +22,23 @@
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
+    <RelativeLayout
+        android:id="@+id/Relative"
+        android:background="@color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <TextView
+            android:id="@+id/contador"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical"
+            android:textColor="@color/white"
+            android:textSize="50dp"
+            android:textStyle="bold">
+
+        </TextView>
+    </RelativeLayout>
 
     <com.example.cameraparameters.GridOverlayView
         android:id="@+id/gridOverlay"
@@ -61,7 +78,7 @@
                     android:id="@+id/card_view_1"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:layout_marginStart="830dp"
+                    android:layout_marginStart="900dp"
                     android:clickable="true"
                     android:onClick="onCardClicked"
                     app:cardCornerRadius="75dp"
@@ -95,6 +112,7 @@
                         android:scaleType="fitCenter"
                         android:src="@drawable/f1"
                         tools:ignore="ContentDescription" />
+
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
@@ -375,9 +393,9 @@
             android:layout_weight="1" />
 
         <ImageButton
+            android:id="@+id/clock"
             android:layout_width="30dp"
             android:layout_height="30dp"
-
             android:background="@drawable/timer_24dp_fill0_wght400_grad0_opsz24"
             android:importantForAccessibility="no"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />

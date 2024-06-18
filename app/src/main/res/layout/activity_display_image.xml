@@ -3,14 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_gravity="top"
+        android:layout_alignParentTop="true"
         android:gravity="center"
         android:orientation="horizontal"
+        android:background="@color/black"
         tools:ignore="RtlHardcoded">
 
         <ImageButton
@@ -19,9 +22,9 @@
             android:layout_height="30dp"
             android:layout_marginStart="25dp"
             android:background="@drawable/arrow"
+            android:backgroundTint="@color/white"
             android:importantForAccessibility="no"
             android:rotation="180"
-            android:backgroundTint="@color/black"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
 
         </ImageButton>
@@ -39,8 +42,8 @@
             android:layout_height="30dp"
             android:layout_marginRight="30dp"
             android:background="@drawable/download"
+            android:backgroundTint="@color/white"
             android:importantForAccessibility="no"
-            android:backgroundTint="@color/black"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
 
         </ImageButton>
@@ -51,8 +54,8 @@
             android:layout_height="30dp"
             android:layout_marginEnd="25dp"
             android:background="@drawable/share_24dp_fill0_wght400_grad0_opsz24"
+            android:backgroundTint="@color/white"
             android:importantForAccessibility="no"
-            android:backgroundTint="@color/black"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck">
 
         </ImageButton>
@@ -64,6 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/cambiar_altura"
+        android:layout_below="@+id/top"
         android:background="@color/transparent"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
@@ -76,13 +80,23 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
         android:visibility="gone"
-
         app:cardBackgroundColor="@android:color/black"
         app:cardCornerRadius="16dp">
 
+        <com.example.rulerview.RulerView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            app:backgroundColor="@android:color/black"
+            app:longTickHeight="50dp"
+            app:pointerColor="@android:color/holo_blue_light"
+            app:shortTickHeight="25dp"
+            app:tickColor="@android:color/white"
+            app:tickSpacing="18dp" />
+
         <SeekBar
             android:id="@+id/seekBar_crop"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_gravity="center_vertical|center_horizontal"
             android:max="100"
@@ -97,17 +111,27 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
         android:visibility="gone"
-
         app:cardBackgroundColor="@android:color/black"
         app:cardCornerRadius="16dp">
 
+        <com.example.rulerview.RulerView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            app:backgroundColor="@android:color/black"
+            app:longTickHeight="50dp"
+            app:pointerColor="@android:color/holo_blue_light"
+            app:shortTickHeight="25dp"
+            app:tickColor="@android:color/white"
+            app:tickSpacing="18dp" />
+
         <SeekBar
             android:id="@+id/seekBar_filters"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_gravity="center_vertical|center_horizontal"
             android:max="100"
-            android:tickMark="@color/white" />
+            android:tickMark="@color/white"  />
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -117,18 +141,28 @@
         android:layout_above="@id/cambiar_altura"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
-
         android:visibility="gone"
         app:cardBackgroundColor="@android:color/black"
         app:cardCornerRadius="16dp">
 
+        <com.example.rulerview.RulerView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            app:backgroundColor="@android:color/black"
+            app:longTickHeight="50dp"
+            app:pointerColor="@android:color/holo_blue_light"
+            app:shortTickHeight="25dp"
+            app:tickColor="@android:color/white"
+            app:tickSpacing="18dp" />
+
         <SeekBar
             android:id="@+id/seekBar_rotate"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:max="360"
-            android:tickMark="@color/white" />
+            android:max="100"
+            android:tickMark="@color/white"  />
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -143,14 +177,24 @@
         app:cardBackgroundColor="@android:color/black"
         app:cardCornerRadius="16dp">
 
+        <com.example.rulerview.RulerView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            app:backgroundColor="@android:color/black"
+            app:longTickHeight="50dp"
+            app:pointerColor="@android:color/holo_blue_light"
+            app:shortTickHeight="25dp"
+            app:tickColor="@android:color/white"
+            app:tickSpacing="18dp" />
+
         <SeekBar
             android:id="@+id/seekBar_brightness"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_gravity="center_vertical|center_horizontal"
             android:max="100"
-            android:tickMark="@color/white"
-            app:tint="@color/black" />
+            android:tickMark="@color/white"  />
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -165,13 +209,24 @@
         app:cardBackgroundColor="@android:color/black"
         app:cardCornerRadius="16dp">
 
+        <com.example.rulerview.RulerView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            app:backgroundColor="@android:color/black"
+            app:longTickHeight="50dp"
+            app:pointerColor="@android:color/holo_blue_light"
+            app:shortTickHeight="25dp"
+            app:tickColor="@android:color/white"
+            app:tickSpacing="18dp" />
+
         <SeekBar
             android:id="@+id/seekBar_raw"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_gravity="center_vertical|center_horizontal"
             android:max="100"
-            android:tickMark="@color/white" />
+            android:tickMark="@color/white"/>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -220,7 +275,7 @@
             android:layout_height="100dp"
             android:background="@color/black"
             android:scrollbars="none"
-            android:visibility="visible"
+            android:visibility="gone"
             tools:ignore="SpeakableTextPresentCheck">
 
             <LinearLayout
