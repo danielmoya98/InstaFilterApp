@@ -126,13 +126,20 @@ class MainActivity : AppCompatActivity() {
         clockButton = findViewById(R.id.clock)
 
         clockButton.setOnClickListener {
-            if(contadorActivo == false){
+            // Invierte el estado actual del ImageButton
+            clockButton.isSelected = !clockButton.isSelected
+
+            if (clockButton.isSelected) {
+                // Cuando está activado
                 contadorActivo = true
-            }
-            else{
+                Toast.makeText(this, "El contador está activado", Toast.LENGTH_SHORT).show()
+            } else {
+                // Cuando está desactivado
                 contadorActivo = false
+                Toast.makeText(this, "El contador está desactivado", Toast.LENGTH_SHORT).show()
             }
         }
+
 
         toggleButton.setOnClickListener {
             isFlashOn = !isFlashOn

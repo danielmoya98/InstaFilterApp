@@ -436,7 +436,7 @@
             android:id="@+id/clock"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/timer_24dp_fill0_wght400_grad0_opsz24"
+            android:background="@drawable/button_selecton_timer"
             android:importantForAccessibility="no"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
