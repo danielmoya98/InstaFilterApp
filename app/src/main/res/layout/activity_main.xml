@@ -34,10 +34,10 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal|center_vertical"
             android:textColor="@color/white"
-            android:textSize="50dp"
+            android:textSize="50sp"
             android:textStyle="bold">
-
         </TextView>
+
     </RelativeLayout>
 
     <com.example.cameraparameters.GridOverlayView
@@ -80,6 +80,7 @@
                     android:layout_height="70dp"
                     android:layout_marginStart="900dp"
                     android:clickable="true"
+                    android:focusable="true"
                     android:onClick="onCardClicked"
                     app:cardCornerRadius="75dp"
                     app:cardElevation="4dp"

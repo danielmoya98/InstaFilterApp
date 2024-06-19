@@ -1,11 +1,15 @@
 package com.example.instafilterapp
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -76,12 +80,16 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var contadorTextView: TextView
     private lateinit var clockButton: ImageButton
-
+    private var photoUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        val toggleButton = findViewById<ImageButton>(R.id.toggle_button)
+        val cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
+        val cameraId = cameraManager.cameraIdList[0]
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -126,8 +134,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        mImageButton.setOnClickListener {
-            toggleFlash()
+        toggleButton.setOnClickListener {
+            isFlashOn = !isFlashOn
+            toggleFlash(cameraManager, cameraId, isFlashOn)
+            toggleButton.isSelected = isFlashOn
         }
 
         val rotateCameraButton: ImageButton = findViewById(R.id.rotar_camara)
@@ -276,6 +286,34 @@ class MainActivity : AppCompatActivity() {
 
     private var filteredBitmap: Bitmap? = null
 
+//    private fun takePhoto() {
+//        val bitmapToSave = filteredBitmap ?: return
+//
+//        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+//            .format(System.currentTimeMillis())
+//        val contentValues = ContentValues().apply {
+//            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+//            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+//            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+//                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+//            }
+//        }
+//
+//        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+//        uri?.let {
+//            val outputStream = contentResolver.openOutputStream(it)
+//            if (outputStream != null) {
+//                bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+//            }
+//            outputStream?.close()
+//
+//            val msg = "Captura de foto exitosa: $it"
+//            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+//            Log.d(TAG, msg)
+//        }
+//    }
+
+
     private fun takePhoto() {
         val bitmapToSave = filteredBitmap ?: return
 
@@ -297,22 +335,40 @@ class MainActivity : AppCompatActivity() {
             }
             outputStream?.close()
 
-            val msg = "Captura de foto exitosa: $it"
-            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-            Log.d(TAG, msg)
+            // Llamar a la función para iniciar la otra actividad con la URI de la foto
+            startDisplayImageActivity(it)
         }
     }
 
-    private fun toggleFlash() {
-        imageCapture?.let {
-            isFlashOn = !isFlashOn
-            Log.d("CameraX", "Flash cambiado, isFlashOn: $isFlashOn")
-            it.flashMode = if (isFlashOn) {
-                ImageCapture.FLASH_MODE_ON
-            } else {
-                ImageCapture.FLASH_MODE_OFF
+    private fun startDisplayImageActivity(photoUri: Uri) {
+        val intent = Intent(this, DisplayImageActivity::class.java)
+        intent.putExtra("photoUri", photoUri.toString())
+        startActivity(intent)
+    }
+
+
+    private fun getRearCameraId(cameraManager: CameraManager): String? {
+        try {
+            for (cameraId in cameraManager.cameraIdList) {
+                val characteristics = cameraManager.getCameraCharacteristics(cameraId)
+                val cameraFacing = characteristics.get(CameraCharacteristics.LENS_FACING)
+                if (cameraFacing != null && cameraFacing == CameraCharacteristics.LENS_FACING_BACK) {
+                    return cameraId
+                }
             }
-            updateFlashIcon()
+        } catch (e: CameraAccessException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    private fun toggleFlash(cameraManager: CameraManager, cameraId: String?, turnOn: Boolean) {
+        if (cameraId != null) {
+            try {
+                cameraManager.setTorchMode(cameraId, turnOn)
+            } catch (e: CameraAccessException) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -371,19 +427,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 101 && resultCode == RESULT_OK) {
             val selectedImageUri: Uri? = data?.data
             if (selectedImageUri != null) {
-                val intent = Intent(this, DisplayImageActivity::class.java)
-                intent.putExtra("imageUri", selectedImageUri.toString())
-                startActivity(intent)
+                startDisplayImageActivity(selectedImageUri)
             } else {
                 Toast.makeText(this, "No se ha seleccionado ninguna imagen", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     fun onCardClicked(view: View) {
         when (view.id) {
@@ -459,6 +515,8 @@ class MainActivity : AppCompatActivity() {
             contadorTextView.visibility = View.INVISIBLE
         }
     }
+
+
     private fun contarTresSegundos() {
         // Inicializar el contador con 3 segundos (3000 milisegundos)
         object : CountDownTimer(3000, 1000) {
