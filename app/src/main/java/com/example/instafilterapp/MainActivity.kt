@@ -65,13 +65,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mImageButton: ImageButton
     private var isScrollViewVisible = false
-
-
     private var contadorActivo = false
-
     private var isFlashOn = false
-
-
 
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private lateinit var horizontalScrollView: HorizontalScrollView
@@ -139,7 +134,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "El contador está desactivado", Toast.LENGTH_SHORT).show()
             }
         }
-
 
         toggleButton.setOnClickListener {
             isFlashOn = !isFlashOn

@@ -1,12 +1,12 @@
 package com.example.instafilterapp
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -34,7 +34,7 @@ class DisplayImageActivity : AppCompatActivity() {
     private lateinit var seekBarRaw: SeekBar
     private lateinit var seekBarBalance: SeekBar
 
-    private lateinit var originalMat: Mat
+    private var originalMat: Mat? = null
     private lateinit var processedMat: Mat
     private lateinit var bitmap: Bitmap
 
@@ -42,12 +42,13 @@ class DisplayImageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_image)
 
-        // Inicializar OpenCV
+        // Initialize OpenCV
         if (!OpenCVLoader.initDebug()) {
-            // Handle initialization error
+            Log.e("OpenCV", "OpenCV initialization failed")
+            // Handle initialization error if needed
         }
 
-        // Obtener referencias de vistas
+        // Get view references
         imageView = findViewById(R.id.image_view)
         seekBarBrightness = findViewById(R.id.seekBar_brightness)
         seekBarFilters = findViewById(R.id.seekBar_filters)
@@ -63,7 +64,7 @@ class DisplayImageActivity : AppCompatActivity() {
         cardViewRaw = findViewById(R.id.card_view_raw)
         cardViewBalance = findViewById(R.id.card_view_balance)
 
-        // Inicializar LinearLayouts
+        // Initialize LinearLayouts
         val llCrop: LinearLayout = findViewById(R.id.ll_crop)
         val llFilters: LinearLayout = findViewById(R.id.ll_filters)
         val llRotate: LinearLayout = findViewById(R.id.ll_rotate)
@@ -71,13 +72,13 @@ class DisplayImageActivity : AppCompatActivity() {
         val llRaw: LinearLayout = findViewById(R.id.ll_raw)
         val llBalance: LinearLayout = findViewById(R.id.ll_balance)
 
-        // Botones para controlar la visibilidad del ScrollView horizontal
+        // Buttons to control the visibility of the horizontal ScrollView
         val arrowButton: ImageButton = findViewById(R.id.arrow_button)
         val upButton: ImageButton = findViewById(R.id.up)
         val horizontalScrollView: HorizontalScrollView = findViewById(R.id.horizontal_scroll_view)
         val downButton: ImageButton = findViewById(R.id.down)
 
-        // Configurar onClickListeners para toggle de CardViews
+        // Set onClickListeners for toggling CardViews
         llCrop.setOnClickListener {
             toggleCardView(cardViewCrop)
         }
@@ -102,7 +103,7 @@ class DisplayImageActivity : AppCompatActivity() {
             toggleCardView(cardViewBalance)
         }
 
-        // Configurar onClickListeners para controlar la visibilidad del ScrollView horizontal
+        // Set onClickListeners to control the visibility of the horizontal ScrollView
         upButton.setOnClickListener {
             upButton.visibility = View.GONE
             downButton.visibility = View.VISIBLE
@@ -115,79 +116,112 @@ class DisplayImageActivity : AppCompatActivity() {
             horizontalScrollView.visibility = View.GONE
         }
 
-        // Configurar onClickListener para el botón de regreso a MainActivity
+        // Set onClickListener for the back button to MainActivity
         arrowButton.setOnClickListener {
             val intent = Intent(this@DisplayImageActivity, MainActivity::class.java)
             startActivity(intent)
         }
 
-        // Obtener la Uri de la imagen seleccionada desde MainActivity
+        // Get the Uri of the selected image from MainActivity
         val photoUriString = intent.getStringExtra("photoUri")
         val photoUri = Uri.parse(photoUriString)
 
-        // Mostrar la imagen en ImageView
+        // Display the image in ImageView
         imageView.setImageURI(photoUri)
 
-        // Obtener la Uri del Bitmap seleccionado (si lo hay)
+        // Get the Uri of the selected Bitmap (if any)
         val imageUri: String? = intent.getStringExtra("imageUri")
 
-        // Decodificar y mostrar el Bitmap en ImageView
+        // Decode and display the Bitmap in ImageView
         if (imageUri != null) {
             val uri = Uri.parse(imageUri)
             bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
             imageView.setImageBitmap(bitmap)
 
-            // Convertir el Bitmap a Matriz original
+            // Convert the Bitmap to the original matrix
             originalMat = Mat()
             Utils.bitmapToMat(bitmap, originalMat)
 
-            // Clonar la Matriz original a la Matriz procesada
-            processedMat = originalMat.clone()
+            // Clone the original matrix to the processed matrix
+            originalMat?.let {
+                processedMat = it.clone()
+            } ?: run {
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
+        } else if (photoUriString != null) {
+            // There is a photoUri provided but no imageUri (Bitmap)
+            Toast.makeText(this, "Loading image...", Toast.LENGTH_SHORT).show()
+            bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(photoUri))
+            imageView.setImageBitmap(bitmap)
+
+            // Convert the Bitmap to the original matrix
+            originalMat = Mat()
+            Utils.bitmapToMat(bitmap, originalMat)
+
+            // Clone the original matrix to the processed matrix
+            originalMat?.let {
+                processedMat = it.clone()
+            } ?: run {
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
         } else {
+            // No valid image to display
             Toast.makeText(this, "No image to display", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
 
-        // Configurar SeekBarChangeListener para el brillo
+        // Set SeekBarChangeListener for brightness
         seekBarBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                applyBrightnessChange(progress - 50)
+                if (originalMat != null) {
+                    applyBrightnessChange(progress - 50)
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Configurar SeekBarChangeListener para los filtros
+        // Set SeekBarChangeListener for filters
         seekBarFilters.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                applyFilterChange(progress)
+                if (originalMat != null) {
+                    applyFilterChange(progress)
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Configurar SeekBarChangeListener para la rotación
+        // Set SeekBarChangeListener for rotation
         seekBarRotate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                applyRotationChange(progress)
+                if (originalMat != null) {
+                    applyRotationChange(progress)
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Configurar onClickListener para el botón de descarga
+        // Set onClickListener for the download button
         findViewById<View>(R.id.download_button).setOnClickListener {
             val success = ImageUtils.saveImageToGallery(this@DisplayImageActivity, imageView, "image_filename.png")
             if (success) {
-                Toast.makeText(this@DisplayImageActivity, "Imagen guardada correctamente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DisplayImageActivity, "Image saved successfully", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this@DisplayImageActivity, "Error al guardar la imagen", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DisplayImageActivity, "Error saving image", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Configurar onClickListener para el botón de compartir
+        // Set onClickListener for the share button
         findViewById<View>(R.id.share_button).setOnClickListener {
             val imagePath = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)}/InstaFilter/image_filename.png"
             ImageUtils.shareImageFromGallery(this@DisplayImageActivity, imagePath)
@@ -195,32 +229,38 @@ class DisplayImageActivity : AppCompatActivity() {
     }
 
     private fun applyBrightnessChange(brightness: Int) {
-        originalMat.copyTo(processedMat)
-        processedMat.convertTo(processedMat, CvType.CV_8UC1, 1.0, brightness.toDouble())
-        updateImageViewFromMat(processedMat)
+        originalMat?.let {
+            it.copyTo(processedMat)
+            processedMat.convertTo(processedMat, CvType.CV_8UC1, 1.0, brightness.toDouble())
+            updateImageViewFromMat(processedMat)
+        }
     }
 
     private fun applyFilterChange(filterValue: Int) {
-        val alpha = 1.0 + (filterValue / 100.0)
-        originalMat.copyTo(processedMat)
-        processedMat.convertTo(processedMat, -1, alpha, 0.0)
-        updateImageViewFromMat(processedMat)
+        originalMat?.let {
+            val alpha = 1.0 + (filterValue / 100.0)
+            it.copyTo(processedMat)
+            processedMat.convertTo(processedMat, -1, alpha, 0.0)
+            updateImageViewFromMat(processedMat)
+        }
     }
 
     private fun applyRotationChange(rotationValue: Int) {
-        originalMat.copyTo(processedMat)
-        val center = org.opencv.core.Point((processedMat.cols() / 2).toDouble(), (processedMat.rows() / 2).toDouble())
-        val rotationMatrix = Imgproc.getRotationMatrix2D(center, rotationValue.toDouble(), 1.0)
-        Imgproc.warpAffine(processedMat, processedMat, rotationMatrix, processedMat.size())
-        updateImageViewFromMat(processedMat)
+        originalMat?.let {
+            it.copyTo(processedMat)
+            val center = org.opencv.core.Point((processedMat.cols() / 2).toDouble(), (processedMat.rows() / 2).toDouble())
+            val rotationMatrix = Imgproc.getRotationMatrix2D(center, rotationValue.toDouble(), 1.0)
+            Imgproc.warpAffine(processedMat, processedMat, rotationMatrix, processedMat.size())
+            updateImageViewFromMat(processedMat)
+        }
     }
 
     private fun updateImageViewFromMat(mat: Mat) {
-        // Convertir la matriz procesada a un bitmap
+        // Convert the processed matrix to a bitmap
         val resultBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(mat, resultBitmap)
 
-        // Establecer el bitmap en el imageView
+        // Set the bitmap in the imageView
         imageView.setImageBitmap(resultBitmap)
     }
 
@@ -242,3 +282,4 @@ class DisplayImageActivity : AppCompatActivity() {
         cardViewBalance.visibility = View.GONE
     }
 }
+
