@@ -341,47 +341,7 @@ class DisplayImageActivity : AppCompatActivity() {
     }
 
 
-    private fun saveAndShareImage() {
-        val bitmapToSave = (imageView.drawable as BitmapDrawable).bitmap
 
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/InstaFilterApp")
-            }
-        }
-
-        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-        uri?.let {
-            val outputStream = contentResolver.openOutputStream(it)
-            if (outputStream != null) {
-                bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-            }
-            outputStream?.close()
-
-            // Notify the gallery about the new image
-            val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
-            intent.data = uri
-            sendBroadcast(intent)
-
-            // Share the image
-            shareImage(uri)
-        } ?: run {
-            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun shareImage(imageUri: Uri) {
-        val shareIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_STREAM, imageUri)
-            type = "image/jpeg"
-        }
-        startActivity(Intent.createChooser(shareIntent, "Share Image"))
-    }
 
 
 
@@ -415,136 +375,136 @@ class DisplayImageActivity : AppCompatActivity() {
     fun onCardClick(view: View) {
         when (view.id) {
             R.id.cv1 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 imageView.setImageBitmap(bitmapMoment)
             }
 
             R.id.cv2 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterMotion(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv3 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.cannyFiltro(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv4 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyPixelize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv5 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyPosterize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv6 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applySepia(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv7 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applySobel(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv8 -> {
-                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.detectFace(bitmapMoment, cascadeClassifier)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv9 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyDogFilter(bitmapMoment, cascadeClassifier, this)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv10 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterContours(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv11 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterBlur(bitmapMoment, "")
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv12 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterSkin(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv13 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterEqualize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv14 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterClahe(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv15 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterLab(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv16 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterSobelX(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv17 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterSobelY(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv18 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filter3Bits(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv19 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterMaxRgb(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv20 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterChaoticRgb(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
             R.id.cv21 -> {
-//                var bitmapMoment = bitmap.copy(bitmap.config, true)
-                var bitmapMoment = bitmap
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.anonymizeFacePixelate(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
@@ -644,6 +604,46 @@ class DisplayImageActivity : AppCompatActivity() {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
+    private fun saveAndShareImage() {
+        val bitmapToSave = (imageView.drawable as BitmapDrawable).bitmap
 
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+            .format(System.currentTimeMillis())
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/InstaFilterApp")
+            }
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            val outputStream = contentResolver.openOutputStream(it)
+            if (outputStream != null) {
+                bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            }
+            outputStream?.close()
+
+            // Notify the gallery about the new image
+            val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+            intent.data = uri
+            sendBroadcast(intent)
+
+            // Share the image
+            shareImage(uri)
+        } ?: run {
+            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun shareImage(imageUri: Uri) {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, imageUri)
+            type = "image/jpeg"
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share Image"))
+    }
 }
 

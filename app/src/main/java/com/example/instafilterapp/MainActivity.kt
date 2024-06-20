@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
@@ -273,6 +274,11 @@ class MainActivity : AppCompatActivity() {
                                     27 -> openUtils.filterChaoticRgb(bitmap)
                                     28 -> openUtils.anonymizeFacePixelate(bitmap)
                                     else -> bitmap
+                                }
+
+
+                                if(rotar == CameraSelector.DEFAULT_FRONT_CAMERA){
+                                    newBitmap = Bitmap.createBitmap(newBitmap, 0, 0, newBitmap.width, newBitmap.height, Matrix().apply { postScale(-1f, 1f) }, true)
                                 }
 
                                 viewBinding.viewImage.setImageBitmap(newBitmap)

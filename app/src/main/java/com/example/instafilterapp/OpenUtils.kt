@@ -166,8 +166,8 @@ class OpenUtils {
 
         for(i in facesArray.indices){
             var submat: Mat = mat.submat(facesArray[i])
-            Imgproc.blur(submat, submat, Size(10.0, 10.0))
-            Imgproc.rectangle(mat, facesArray[i].tl(), facesArray[i].br(), Scalar(0.0, 255.0, 0.0, 255.0), 2)
+            Imgproc.blur(submat, submat, Size(50.0, 50.0))
+//            Imgproc.rectangle(mat, facesArray[i].tl(), facesArray[i].br(), Scalar(0.0, 255.0, 0.0, 255.0), 2)
         }
 
 
@@ -1227,6 +1227,65 @@ class OpenUtils {
 
 
 ////////////Filtro que se usa
+//    fun filterContours(bitmap: Bitmap): Bitmap {
+//        val mat = Mat()
+//        val grayMat = Mat()
+//        val frame = Mat()
+//
+//        // Convert Bitmap to Mat
+//        Utils.bitmapToMat(bitmap, mat)
+//
+//        // Convert to grayscale
+//        Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY)
+//
+//        // Make a copy of the original frame
+//        mat.copyTo(frame)
+//
+//        // Use various thresholds
+//        val thresholds = listOf(15, 50, 100, 240)
+//        for (threshold in thresholds) {
+//            val thresh = Mat()
+//
+//            // Apply threshold
+//            Imgproc.threshold(grayMat, thresh, threshold.toDouble(), 255.0, Imgproc.THRESH_BINARY)
+//
+//            // Find contours
+//            val contours = ArrayList<MatOfPoint>()
+//            val hierarchy = Mat()
+//            Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE)
+//
+//            for (contour in contours) {
+//                val mask = Mat.zeros(grayMat.size(), CvType.CV_8U)
+//
+//                // Create empty mask and fill it with white color
+//                Imgproc.drawContours(mask, listOf(contour), 0, Scalar(255.0), -1)
+//
+//                // Find mean color inside mask
+//                val mean = Core.mean(mat, mask)
+//
+//                // Draw frame with masked mean color
+//                Imgproc.drawContours(frame, listOf(contour), 0, Scalar(mean.`val`[0], mean.`val`[1], mean.`val`[2], mean.`val`[3]), -1)
+//            }
+//
+//            // Draw contours with black color
+//            Imgproc.drawContours(frame, contours, -1, Scalar(0.0, 0.0, 0.0), 1)
+//
+//            // Release the threshold matrix
+//            thresh.release()
+//            hierarchy.release()
+//        }
+//
+//        // Convert the result back to Bitmap
+//        Utils.matToBitmap(frame, bitmap)
+//
+//        // Release Mats
+//        mat.release()
+//        grayMat.release()
+//        frame.release()
+//
+//        return bitmap
+//    }
+
     fun filterContours(bitmap: Bitmap): Bitmap {
         val mat = Mat()
         val grayMat = Mat()
@@ -1240,6 +1299,9 @@ class OpenUtils {
 
         // Make a copy of the original frame
         mat.copyTo(frame)
+
+        // Create a reusable mask
+        val mask = Mat.zeros(grayMat.size(), CvType.CV_8U)
 
         // Use various thresholds
         val thresholds = listOf(15, 50, 100, 240)
@@ -1255,22 +1317,23 @@ class OpenUtils {
             Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE)
 
             for (contour in contours) {
-                val mask = Mat.zeros(grayMat.size(), CvType.CV_8U)
+                // Reset mask to zero
+                mask.setTo(Scalar(0.0))
 
-                // Create empty mask and fill it with white color
+                // Draw contour on mask
                 Imgproc.drawContours(mask, listOf(contour), 0, Scalar(255.0), -1)
 
                 // Find mean color inside mask
                 val mean = Core.mean(mat, mask)
 
-                // Draw frame with masked mean color
+                // Draw contour with mean color on frame
                 Imgproc.drawContours(frame, listOf(contour), 0, Scalar(mean.`val`[0], mean.`val`[1], mean.`val`[2], mean.`val`[3]), -1)
             }
 
             // Draw contours with black color
             Imgproc.drawContours(frame, contours, -1, Scalar(0.0, 0.0, 0.0), 1)
 
-            // Release the threshold matrix
+            // Release the threshold and hierarchy matrices
             thresh.release()
             hierarchy.release()
         }
@@ -1282,6 +1345,7 @@ class OpenUtils {
         mat.release()
         grayMat.release()
         frame.release()
+        mask.release()
 
         return bitmap
     }
@@ -1307,7 +1371,8 @@ class OpenUtils {
 
 
 
-///////se usa
+
+    ///////se usa
     fun filterBlur(bitmap: Bitmap, blurType: String): Bitmap {
         val mat = Mat()
         val result = Mat()
