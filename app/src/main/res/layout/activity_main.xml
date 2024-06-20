@@ -78,7 +78,7 @@
                     android:id="@+id/card_view_1"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:layout_marginStart="900dp"
+                    android:layout_marginStart="1600dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:onClick="onCardClicked"
