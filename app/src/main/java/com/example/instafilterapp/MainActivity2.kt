@@ -14,7 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.soundcloud.android.crop.Crop
+//import com.soundcloud.android.crop.Crop
 import java.io.File
 
 class MainActivity2 : AppCompatActivity() {
@@ -28,7 +28,7 @@ class MainActivity2 : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.eqw)
+//        setContentView(R.layout.eqw)
 
 
 
@@ -58,24 +58,24 @@ class MainActivity2 : AppCompatActivity() {
 
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_PICK_IMAGE && resultCode == RESULT_OK && data != null) {
-            val uri = data.data
-            if (uri != null) {
-                Crop.of(uri, Uri.fromFile(File(cacheDir, "cropped")))
-                    .asSquare()
-                    .start(this)
-            }
-        } else if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
-            val croppedUri = Crop.getOutput(data)
-            if (       croppedUri != null) {
-                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, croppedUri)
-                imageView.setImageBitmap(bitmap)
-                saveImageToGallery(bitmap)
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == REQUEST_CODE_PICK_IMAGE && resultCode == RESULT_OK && data != null) {
+//            val uri = data.data
+//            if (uri != null) {
+//                Crop.of(uri, Uri.fromFile(File(cacheDir, "cropped")))
+//                    .asSquare()
+//                    .start(this)
+//            }
+//        } else if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
+//            val croppedUri = Crop.getOutput(data)
+//            if (       croppedUri != null) {
+//                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, croppedUri)
+//                imageView.setImageBitmap(bitmap)
+//                saveImageToGallery(bitmap)
+//            }
+//        }
+//    }
 
     private fun saveImageToGallery(bitmap: Bitmap) {
         val contentValues = ContentValues().apply {

@@ -1,5 +1,6 @@
 package com.example.instafilterapp
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,8 +8,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -28,6 +31,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class DisplayImageActivity : AppCompatActivity() {
 
@@ -55,6 +60,8 @@ class DisplayImageActivity : AppCompatActivity() {
     private var openUtils = OpenUtils()
     private lateinit var cascadeClassifier: CascadeClassifier
 
+    lateinit var saveButton: ImageButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_image)
@@ -81,6 +88,9 @@ class DisplayImageActivity : AppCompatActivity() {
         cardViewRaw = findViewById(R.id.card_view_raw)
         cardViewBalance = findViewById(R.id.card_view_balance)
 
+
+        saveButton = findViewById(R.id.save_button)
+
         // Initialize LinearLayouts
         val llCrop: LinearLayout = findViewById(R.id.ll_crop)
         val llarrow: LinearLayout = findViewById(R.id.arrow_button)
@@ -88,6 +98,7 @@ class DisplayImageActivity : AppCompatActivity() {
         val llRotate: LinearLayout = findViewById(R.id.ll_rotate)
         val llBrightness: LinearLayout = findViewById(R.id.ll_brightness)
         val llRaw: LinearLayout = findViewById(R.id.ll_raw)
+
 //        val llBalance: LinearLayout = findViewById(R.id.ll_balance)
 
         // Buttons to control the visibility of the horizontal ScrollView
@@ -122,7 +133,9 @@ class DisplayImageActivity : AppCompatActivity() {
 //        llBalance.setOnClickListener {
 //            toggleCardView(cardViewBalance)
 //        }
-
+        saveButton.setOnClickListener {
+            guardarImage()
+        }
 
         // Set onClickListener for the back button to MainActivity
 
@@ -255,9 +268,15 @@ class DisplayImageActivity : AppCompatActivity() {
 
         // Set onClickListener for the share button
         findViewById<View>(R.id.share_button).setOnClickListener {
-            val imagePath =
-                "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)}/InstaFilter/image_filename.png"
-//            ImageUtils.shareImageFromGallery(this@DisplayImageActivity, imagePath)
+            // First, save the image to storage if it hasn't been saved yet
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                // If we don't have permission, request it
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+                saveImagePending = true
+            } else {
+                // Save the image and then share it
+                saveAndShareImage()
+            }
         }
 
 
@@ -321,6 +340,51 @@ class DisplayImageActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun saveAndShareImage() {
+        val bitmapToSave = (imageView.drawable as BitmapDrawable).bitmap
+
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+            .format(System.currentTimeMillis())
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/InstaFilterApp")
+            }
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            val outputStream = contentResolver.openOutputStream(it)
+            if (outputStream != null) {
+                bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            }
+            outputStream?.close()
+
+            // Notify the gallery about the new image
+            val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+            intent.data = uri
+            sendBroadcast(intent)
+
+            // Share the image
+            shareImage(uri)
+        } ?: run {
+            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun shareImage(imageUri: Uri) {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, imageUri)
+            type = "image/jpeg"
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share Image"))
+    }
+
+
+
     private fun updateImageViewFromMat(mat: Mat) {
         // Convert the processed matrix to a bitmap
         val resultBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
@@ -351,54 +415,63 @@ class DisplayImageActivity : AppCompatActivity() {
     fun onCardClick(view: View) {
         when (view.id) {
             R.id.cv1 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 imageView.setImageBitmap(bitmapMoment)
             }
 
             R.id.cv2 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.cannyFiltroBlanco(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv3 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.cannyFiltro(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv4 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyPixelize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv5 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyPosterize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv6 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applySepia(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv7 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applySobel(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv8 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                //                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.detectFace(bitmapMoment, cascadeClassifier)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv9 -> {
-                var bitmapMoment = bitmap.copy(bitmap.config, true)
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyDogFilter(bitmapMoment, cascadeClassifier, this)
                 imageView.setImageBitmap(newBitmap)
             }
@@ -435,6 +508,69 @@ class DisplayImageActivity : AppCompatActivity() {
 
         return result
     }
+
+
+
+    private fun guardarImage() {
+        // Check if we have write permission
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // If we don't have permission, request it
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+        } else {
+            // Save the image
+            saveImageToStorage()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, save the image
+                saveImageToStorage()
+            } else {
+                // Permission denied, show a message to the user
+                Toast.makeText(this, "Write permission is required to save images", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun saveImageToStorage() {
+        val bitmapToSave = (imageView.drawable as BitmapDrawable).bitmap
+
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+            .format(System.currentTimeMillis())
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/InstaFilterApp")
+            }
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            val outputStream = contentResolver.openOutputStream(it)
+            if (outputStream != null) {
+                bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            }
+            outputStream?.close()
+
+            // Notify the gallery about the new image
+            val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+            intent.data = uri
+            sendBroadcast(intent)
+
+            Toast.makeText(this, "Image saved", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    companion object {
+        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    }
+
 
 }
 
