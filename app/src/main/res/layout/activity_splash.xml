@@ -23,9 +23,9 @@
 
     <ImageView
         android:id="@+id/whitelogo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/white"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/icono"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,9 +35,9 @@
 
     <ImageView
         android:id="@+id/graylogo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/gray"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/icono"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

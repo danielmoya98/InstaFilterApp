@@ -62,4 +62,9 @@ dependencies {
     implementation(libs.androidx.camera.video)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.extensions)
+
+    implementation ("com.soundcloud.android:android-crop:1.0.1@aar")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+
+
 }

@@ -406,6 +406,7 @@
             android:id="@+id/toggle_button"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:visibility="gone"
             android:layout_marginStart="25dp"
             android:background="@drawable/toggle_button_selector"
             android:importantForAccessibility="no"
@@ -452,6 +453,7 @@
             android:layout_marginEnd="25dp"
             android:background="@drawable/arrow"
             android:importantForAccessibility="no"
+            android:visibility="gone"
             android:rotation="90"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 

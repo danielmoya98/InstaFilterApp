@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -102,9 +103,9 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (OpenCVLoader.initLocal()) {
-            Toast.makeText(this, "load", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "load", Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show()
         }
 
         val btnGrid: ImageButton = findViewById(R.id.btnGrid)
@@ -287,34 +288,6 @@ class MainActivity : AppCompatActivity() {
 
     private var filteredBitmap: Bitmap? = null
 
-//    private fun takePhoto() {
-//        val bitmapToSave = filteredBitmap ?: return
-//
-//        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-//            .format(System.currentTimeMillis())
-//        val contentValues = ContentValues().apply {
-//            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-//            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-//            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-//                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-//            }
-//        }
-//
-//        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-//        uri?.let {
-//            val outputStream = contentResolver.openOutputStream(it)
-//            if (outputStream != null) {
-//                bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-//            }
-//            outputStream?.close()
-//
-//            val msg = "Captura de foto exitosa: $it"
-//            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-//            Log.d(TAG, msg)
-//        }
-//    }
-
-
     private fun takePhoto() {
         val bitmapToSave = filteredBitmap ?: return
 
@@ -336,12 +309,22 @@ class MainActivity : AppCompatActivity() {
             }
             outputStream?.close()
 
+            // Reproducir el sonido de la cámara
+            playShutterSound()
+
             // Llamar a la función para iniciar la otra actividad con la URI de la foto
             filtroNum = 0
             startDisplayImageActivity(it)
         }
     }
 
+    private fun playShutterSound() {
+        val mediaPlayer = MediaPlayer.create(this, R.raw.camera)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener {
+            it.release()
+        }
+    }
     private fun startDisplayImageActivity(photoUri: Uri) {
         val intent = Intent(this, DisplayImageActivity::class.java)
         intent.putExtra("photoUri", photoUri.toString())

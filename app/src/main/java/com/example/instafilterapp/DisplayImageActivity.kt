@@ -2,8 +2,10 @@ package com.example.instafilterapp
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -11,14 +13,15 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.StateSet.TAG
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.proyectopdi.OpenUtils
 import org.opencv.android.NativeCameraView
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.core.CvType
 import org.opencv.core.Mat
+import org.opencv.core.Point
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.CascadeClassifier
 import java.io.File
@@ -29,15 +32,17 @@ import java.io.InputStream
 class DisplayImageActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
-    private lateinit var cardViewCrop: CardView
-    private lateinit var cardViewFilters: CardView
-    private lateinit var cardViewRotate: CardView
-    private lateinit var cardViewBrightness: CardView
-    private lateinit var cardViewRaw: CardView
-    private lateinit var cardViewBalance: CardView
-
+    private lateinit var cardViewCrop: FrameLayout
+    private lateinit var cardViewFilters: FrameLayout
+    private lateinit var cardViewRotate: FrameLayout
+    private lateinit var cardViewBrightness: FrameLayout
+    private lateinit var cardViewRaw: FrameLayout
+    private lateinit var cardViewBalance: FrameLayout
+    private val REQUEST_WRITE_EXTERNAL_STORAGE = 1
+    private var saveImagePending = false
     private lateinit var seekBarBrightness: SeekBar
-    private lateinit var seekBarFilters: SeekBar
+
+    //    private lateinit var seekBarFilters: SeekBar
     private lateinit var seekBarRotate: SeekBar
     private lateinit var seekBarCrop: SeekBar
     private lateinit var seekBarRaw: SeekBar
@@ -63,7 +68,7 @@ class DisplayImageActivity : AppCompatActivity() {
         // Get view references
         imageView = findViewById(R.id.image_view)
         seekBarBrightness = findViewById(R.id.seekBar_brightness)
-        seekBarFilters = findViewById(R.id.seekBar_filters)
+
         seekBarRotate = findViewById(R.id.seekBar_rotate)
         seekBarCrop = findViewById(R.id.seekBar_crop)
         seekBarRaw = findViewById(R.id.seekBar_raw)
@@ -78,21 +83,24 @@ class DisplayImageActivity : AppCompatActivity() {
 
         // Initialize LinearLayouts
         val llCrop: LinearLayout = findViewById(R.id.ll_crop)
+        val llarrow: LinearLayout = findViewById(R.id.arrow_button)
         val llFilters: LinearLayout = findViewById(R.id.ll_filters)
         val llRotate: LinearLayout = findViewById(R.id.ll_rotate)
         val llBrightness: LinearLayout = findViewById(R.id.ll_brightness)
         val llRaw: LinearLayout = findViewById(R.id.ll_raw)
-        val llBalance: LinearLayout = findViewById(R.id.ll_balance)
+//        val llBalance: LinearLayout = findViewById(R.id.ll_balance)
 
         // Buttons to control the visibility of the horizontal ScrollView
-        val arrowButton: ImageButton = findViewById(R.id.arrow_button)
-        val upButton: ImageButton = findViewById(R.id.up)
-        val horizontalScrollView: HorizontalScrollView = findViewById(R.id.horizontal_scroll_view)
-        val downButton: ImageButton = findViewById(R.id.down)
+
 
         // Set onClickListeners for toggling CardViews
         llCrop.setOnClickListener {
             toggleCardView(cardViewCrop)
+        }
+
+        llarrow.setOnClickListener {
+            val intent = Intent(this@DisplayImageActivity, MainActivity::class.java)
+            startActivity(intent)
         }
 
         llFilters.setOnClickListener {
@@ -111,28 +119,13 @@ class DisplayImageActivity : AppCompatActivity() {
             toggleCardView(cardViewRaw)
         }
 
-        llBalance.setOnClickListener {
-            toggleCardView(cardViewBalance)
-        }
+//        llBalance.setOnClickListener {
+//            toggleCardView(cardViewBalance)
+//        }
 
-        // Set onClickListeners to control the visibility of the horizontal ScrollView
-        upButton.setOnClickListener {
-            upButton.visibility = View.GONE
-            downButton.visibility = View.VISIBLE
-            horizontalScrollView.visibility = View.VISIBLE
-        }
-
-        downButton.setOnClickListener {
-            downButton.visibility = View.GONE
-            upButton.visibility = View.VISIBLE
-            horizontalScrollView.visibility = View.GONE
-        }
 
         // Set onClickListener for the back button to MainActivity
-        arrowButton.setOnClickListener {
-            val intent = Intent(this@DisplayImageActivity, MainActivity::class.java)
-            startActivity(intent)
-        }
+
 
         // Get the Uri of the selected image from MainActivity
         val photoUriString = intent.getStringExtra("photoUri")
@@ -164,7 +157,7 @@ class DisplayImageActivity : AppCompatActivity() {
             }
         } else if (photoUriString != null) {
             // There is a photoUri provided but no imageUri (Bitmap)
-            Toast.makeText(this, "Loading image...", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "Loading image...", Toast.LENGTH_SHORT).show()
             bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(photoUri))
             imageView.setImageBitmap(bitmap)
 
@@ -200,7 +193,7 @@ class DisplayImageActivity : AppCompatActivity() {
         })
 
         // Set SeekBarChangeListener for filters
-        seekBarFilters.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        seekBarCrop.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (originalMat != null) {
                     applyFilterChange(progress)
@@ -223,25 +216,48 @@ class DisplayImageActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-
-
-
-
-
-        // Set onClickListener for the download button
-        findViewById<View>(R.id.download_button).setOnClickListener {
-            val success = ImageUtils.saveImageToGallery(this@DisplayImageActivity, imageView, "image_filename.png")
-            if (success) {
-                Toast.makeText(this@DisplayImageActivity, "Image saved successfully", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@DisplayImageActivity, "Error saving image", Toast.LENGTH_SHORT).show()
+        seekBarRaw.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (originalMat != null) {
+                    val intensity = progress / 100.0 // Convertir el progreso a un valor entre 0 y 1
+                    val vignetteMat = applyVignetteEffect(originalMat!!, intensity)
+                    // Mostrar la imagen con el efecto de viñeta en tu vista de imagen
+                    val bitmap = Bitmap.createBitmap(
+                        vignetteMat.cols(),
+                        vignetteMat.rows(),
+                        Bitmap.Config.ARGB_8888
+                    )
+                    Utils.matToBitmap(vignetteMat, bitmap)
+                    imageView.setImageBitmap(bitmap)
+                }
             }
-        }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        // Llama a esta función cuando el usuario haga clic en el botón de descarga
+//        findViewById<View>(R.id.download_button).setOnClickListener {
+//            if (ContextCompat.checkSelfPermission(
+//                    this,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                ) == PackageManager.PERMISSION_GRANTED
+//            ) {
+//                saveImage()
+//            } else {
+//                // Solicitar permisos si no están concedidos
+//                saveImagePending = true
+//                requestStoragePermission()
+//            }
+//        }
+
+
 
         // Set onClickListener for the share button
         findViewById<View>(R.id.share_button).setOnClickListener {
-            val imagePath = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)}/InstaFilter/image_filename.png"
-            ImageUtils.shareImageFromGallery(this@DisplayImageActivity, imagePath)
+            val imagePath =
+                "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)}/InstaFilter/image_filename.png"
+//            ImageUtils.shareImageFromGallery(this@DisplayImageActivity, imagePath)
         }
 
 
@@ -255,7 +271,8 @@ class DisplayImageActivity : AppCompatActivity() {
 
 
         try {
-            val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_alt)
+            val inputStream: InputStream =
+                resources.openRawResource(R.raw.haarcascade_frontalface_alt)
             val cascadeDir: File = getDir("cascade", Context.MODE_PRIVATE)
             val mCascadeFile: File = File(cascadeDir, "haarcascade_frontalface_alt.xml")
             val os: FileOutputStream = FileOutputStream(mCascadeFile)
@@ -272,7 +289,6 @@ class DisplayImageActivity : AppCompatActivity() {
             Log.i(NativeCameraView.TAG, "Cascade file not found")
         }
     }
-
 
 
     private fun applyBrightnessChange(brightness: Int) {
@@ -295,7 +311,10 @@ class DisplayImageActivity : AppCompatActivity() {
     private fun applyRotationChange(rotationValue: Int) {
         originalMat?.let {
             it.copyTo(processedMat)
-            val center = org.opencv.core.Point((processedMat.cols() / 2).toDouble(), (processedMat.rows() / 2).toDouble())
+            val center = org.opencv.core.Point(
+                (processedMat.cols() / 2).toDouble(),
+                (processedMat.rows() / 2).toDouble()
+            )
             val rotationMatrix = Imgproc.getRotationMatrix2D(center, rotationValue.toDouble(), 1.0)
             Imgproc.warpAffine(processedMat, processedMat, rotationMatrix, processedMat.size())
             updateImageViewFromMat(processedMat)
@@ -311,7 +330,7 @@ class DisplayImageActivity : AppCompatActivity() {
         imageView.setImageBitmap(resultBitmap)
     }
 
-    private fun toggleCardView(cardView: CardView) {
+    private fun toggleCardView(cardView: FrameLayout) {
         if (cardView.visibility == View.VISIBLE) {
             cardView.visibility = View.GONE
         } else {
@@ -335,41 +354,49 @@ class DisplayImageActivity : AppCompatActivity() {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 imageView.setImageBitmap(bitmapMoment)
             }
+
             R.id.cv2 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.cannyFiltroBlanco(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv3 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.cannyFiltro(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv4 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.applyPixelize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv5 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.applyPosterize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv6 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.applySepia(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv7 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.applySobel(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv8 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.detectFace(bitmapMoment, cascadeClassifier)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv9 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var newBitmap = openUtils.applyDogFilter(bitmapMoment, cascadeClassifier, this)
@@ -377,5 +404,37 @@ class DisplayImageActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    private fun applyVignetteEffect(originalMat: Mat, intensity: Double): Mat {
+        // Paso 1: Convertir la imagen original a escala de grises
+        val grayMat = Mat(originalMat.size(), CvType.CV_8UC1)
+        Imgproc.cvtColor(originalMat, grayMat, Imgproc.COLOR_RGB2GRAY)
+
+        // Paso 2: Calcular el centro de la imagen
+        val center = Point(originalMat.cols() / 2.0, originalMat.rows() / 2.0)
+
+        // Paso 3: Calcular los parámetros de la viñeta
+        val maxDistance = Math.sqrt(Math.pow(center.x, 2.0) + Math.pow(center.y, 2.0)).toFloat()
+        val result = Mat(originalMat.size(), CvType.CV_8UC1)
+
+        // Paso 4: Aplicar el efecto de viñeta
+        for (y in 0 until originalMat.rows()) {
+            for (x in 0 until originalMat.cols()) {
+                val distance = Math.sqrt(
+                    Math.pow(
+                        center.x - x.toDouble(),
+                        2.0
+                    ) + Math.pow(center.y - y.toDouble(), 2.0)
+                )
+                val vignette = 1.0 - Math.pow(distance / maxDistance, intensity)
+                val pixelValue = grayMat.get(y, x)[0] * vignette
+                result.put(y, x, pixelValue)
+            }
+        }
+
+        return result
+    }
+
 }
 
