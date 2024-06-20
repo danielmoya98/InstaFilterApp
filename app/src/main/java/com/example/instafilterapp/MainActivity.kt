@@ -244,7 +244,7 @@ class MainActivity : AppCompatActivity() {
                             if (bitmap != null) {
                                 var newBitmap = when (filtroNum) {
                                     1 -> openUtils.applyDogFilter(bitmap, cascadeClassifier, this)
-                                    2 -> openUtils.variableThreshold(bitmap!!)
+                                    2 -> openUtils.variableThreshold(bitmap)
                                     3 -> openUtils.detectEdges(bitmap)
                                     4 -> openUtils.detectFace(bitmap, cascadeClassifier)
                                     5 -> openUtils.detectFaceEye(bitmap, cascadeClassifier, cascadeClassifier_eye)
@@ -259,6 +259,19 @@ class MainActivity : AppCompatActivity() {
                                     14 -> openUtils.blurBackground(bitmap, cascadeClassifier1)
                                     15 -> openUtils.cambiarColorIris(bitmap, cascadeClassifier_eye)
                                     16 -> openUtils.filterMotion(bitmap)
+                                    /////////////////
+                                    17 -> openUtils.filterContours(bitmap)
+                                    18 -> openUtils.filterBlur(bitmap, "")
+                                    19 -> openUtils.filterSkin(bitmap)
+                                    20 -> openUtils.filterEqualize(bitmap)
+                                    21 -> openUtils.filterClahe(bitmap)
+                                    22 -> openUtils.filterLab(bitmap)
+                                    23 -> openUtils.filterSobelX(bitmap)
+                                    24 -> openUtils.filterSobelY(bitmap)
+                                    25 -> openUtils.filter3Bits(bitmap)
+                                    26 -> openUtils.filterMaxRgb(bitmap)
+                                    27 -> openUtils.filterChaoticRgb(bitmap)
+                                    28 -> openUtils.anonymizeFacePixelate(bitmap)
                                     else -> bitmap
                                 }
 
@@ -435,8 +448,20 @@ class MainActivity : AppCompatActivity() {
             R.id.card_view_5 -> filtroNum = 8
             R.id.card_view_6 -> filtroNum = 10
             R.id.card_view_7 -> filtroNum = 11
-            R.id.card_view_8 -> filtroNum = 4
-            R.id.card_view_9 -> filtroNum = 1
+            R.id.card_view_8 -> filtroNum = 17
+            R.id.card_view_9 -> filtroNum = 18
+
+
+            R.id.card_view_10 -> filtroNum = 19
+            R.id.card_view_11 -> filtroNum = 20
+            R.id.card_view_11 -> filtroNum = 21
+            R.id.card_view_12 -> filtroNum = 22
+            R.id.card_view_13 -> filtroNum = 23
+            R.id.card_view_14 -> filtroNum = 24
+            R.id.card_view_15 -> filtroNum = 25
+            R.id.card_view_16 -> filtroNum = 26
+            R.id.card_view_17 -> filtroNum = 27
+            R.id.card_view_18 -> filtroNum = 28
         }
     }
 

@@ -423,7 +423,7 @@ class DisplayImageActivity : AppCompatActivity() {
             R.id.cv2 -> {
                 //                var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var bitmapMoment = bitmap
-                var newBitmap = openUtils.cannyFiltroBlanco(bitmapMoment)
+                var newBitmap = openUtils.filterMotion(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
@@ -473,6 +473,79 @@ class DisplayImageActivity : AppCompatActivity() {
 //                var bitmapMoment = bitmap.copy(bitmap.config, true)
                 var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyDogFilter(bitmapMoment, cascadeClassifier, this)
+                imageView.setImageBitmap(newBitmap)
+            }
+
+            R.id.cv10 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterContours(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv11 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterBlur(bitmapMoment, "")
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv12 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterSkin(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv13 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterEqualize(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv14 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterClahe(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv15 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterLab(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv16 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterSobelX(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv17 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterSobelY(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv18 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filter3Bits(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv19 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterMaxRgb(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv20 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.filterChaoticRgb(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv21 -> {
+//                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var bitmapMoment = bitmap
+                var newBitmap = openUtils.anonymizeFacePixelate(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
         }
