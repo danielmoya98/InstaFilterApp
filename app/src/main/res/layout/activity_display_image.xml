@@ -111,7 +111,7 @@
         android:layout_above="@id/cambiar_altura"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:cardBackgroundColor="@android:color/black"
         app:cardCornerRadius="16dp">
 
@@ -127,6 +127,11 @@
                 android:layout_gravity="center_vertical">
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -143,6 +148,11 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv2"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -158,6 +168,11 @@
 
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv3"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -173,6 +188,11 @@
 
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv4"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -188,6 +208,11 @@
 
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv5"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -203,6 +228,11 @@
 
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv6"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -218,6 +248,11 @@
 
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv7"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -233,6 +268,11 @@
 
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv8"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
                     android:layout_width="60dp"
                     android:layout_margin="5dp"
                     android:layout_height="60dp"
@@ -247,7 +287,26 @@
                     </ImageView>
 
                 </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv9"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="onCardClick"
+                    tools:ignore="SpeakableTextPresentCheck"
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
 
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
 
         </HorizontalScrollView>

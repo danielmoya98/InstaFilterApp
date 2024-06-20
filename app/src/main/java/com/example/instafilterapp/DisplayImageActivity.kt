@@ -1,5 +1,6 @@
 package com.example.instafilterapp
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,11 +12,19 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.StateSet.TAG
+import com.example.proyectopdi.OpenUtils
+import org.opencv.android.NativeCameraView
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
+import org.opencv.objdetect.CascadeClassifier
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 
 class DisplayImageActivity : AppCompatActivity() {
 
@@ -37,6 +46,9 @@ class DisplayImageActivity : AppCompatActivity() {
     private var originalMat: Mat? = null
     private lateinit var processedMat: Mat
     private lateinit var bitmap: Bitmap
+
+    private var openUtils = OpenUtils()
+    private lateinit var cascadeClassifier: CascadeClassifier
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -214,6 +226,8 @@ class DisplayImageActivity : AppCompatActivity() {
 
 
 
+
+
         // Set onClickListener for the download button
         findViewById<View>(R.id.download_button).setOnClickListener {
             val success = ImageUtils.saveImageToGallery(this@DisplayImageActivity, imageView, "image_filename.png")
@@ -228,6 +242,34 @@ class DisplayImageActivity : AppCompatActivity() {
         findViewById<View>(R.id.share_button).setOnClickListener {
             val imagePath = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)}/InstaFilter/image_filename.png"
             ImageUtils.shareImageFromGallery(this@DisplayImageActivity, imagePath)
+        }
+
+
+
+
+
+
+
+
+
+
+
+        try {
+            val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_alt)
+            val cascadeDir: File = getDir("cascade", Context.MODE_PRIVATE)
+            val mCascadeFile: File = File(cascadeDir, "haarcascade_frontalface_alt.xml")
+            val os: FileOutputStream = FileOutputStream(mCascadeFile)
+            val buffer: ByteArray = ByteArray(4096)
+            var byteRead: Int
+            while (inputStream.read(buffer).also { byteRead = it } != -1) {
+                os.write(buffer, 0, byteRead)
+            }
+            inputStream.close()
+            os.close()
+
+            cascadeClassifier = CascadeClassifier(mCascadeFile.absolutePath)
+        } catch (e: IOException) {
+            Log.i(NativeCameraView.TAG, "Cascade file not found")
         }
     }
 
@@ -285,6 +327,55 @@ class DisplayImageActivity : AppCompatActivity() {
         cardViewBrightness.visibility = View.GONE
         cardViewRaw.visibility = View.GONE
         cardViewBalance.visibility = View.GONE
+    }
+
+    fun onCardClick(view: View) {
+        when (view.id) {
+            R.id.cv1 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                imageView.setImageBitmap(bitmapMoment)
+            }
+            R.id.cv2 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.cannyFiltroBlanco(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv3 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.cannyFiltro(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv4 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.applyPixelize(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv5 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.applyPosterize(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv6 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.applySepia(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv7 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.applySobel(bitmapMoment)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv8 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.detectFace(bitmapMoment, cascadeClassifier)
+                imageView.setImageBitmap(newBitmap)
+            }
+            R.id.cv9 -> {
+                var bitmapMoment = bitmap.copy(bitmap.config, true)
+                var newBitmap = openUtils.applyDogFilter(bitmapMoment, cascadeClassifier, this)
+                imageView.setImageBitmap(newBitmap)
+            }
+        }
     }
 }
 

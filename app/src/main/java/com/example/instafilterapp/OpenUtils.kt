@@ -10,6 +10,7 @@ import org.opencv.android.Utils
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
+import org.opencv.core.MatOfKeyPoint
 import org.opencv.core.MatOfPoint
 import org.opencv.core.MatOfPoint2f
 import org.opencv.core.MatOfRect
@@ -17,17 +18,24 @@ import org.opencv.core.Point
 import org.opencv.core.Rect
 import org.opencv.core.Scalar
 import org.opencv.core.Size
+import org.opencv.features2d.Feature2D
+import org.opencv.features2d.Features2d
+import org.opencv.features2d.SIFT
 import org.opencv.imgproc.Imgproc
 import org.opencv.objdetect.CascadeClassifier
 import org.opencv.objdetect.Objdetect
+import java.util.Collections
+import java.util.Random
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 class OpenUtils {
 
 
 
-    fun setUtil(bitmap: Bitmap):Bitmap{
+    fun grisImage(bitmap: Bitmap):Bitmap{
         val mat = Mat()
 
         Utils.bitmapToMat(bitmap, mat)
@@ -843,55 +851,55 @@ class OpenUtils {
 
 
 
-//    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
-//        // Convertir bitmap a Mat y cambiar a BGRA para manejar alfa desde el principio
-//        val mat = Mat().apply {
-//            Utils.bitmapToMat(bitmap, this)
-//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
-//        }
-//
-//        // Cargar el filtro de perrito y convertirlo directamente a BGRA
-//        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
-//        val dogMat = Mat().apply {
-//            Utils.bitmapToMat(dogBitmap, this)
-//            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
-//        }
-//
-//        // Detección de rostros en BGRA
-//        val faces = MatOfRect()
-//        cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
-//        val facesArray = faces.toArray()
-//
-//        // Aplicar filtro a cada cara detectada
-//        facesArray.forEach { face ->
-//            val dogResized = Mat()
-//            Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
-//
-//            val offsetX = (0.35 * face.width).toInt()
-//            val offsetY = (0.375 * face.height).toInt()
-//            val startX = face.x - offsetX
-//            val startY = face.y - offsetY
-//
-//            for (i in 0 until dogResized.rows()) {
-//                for (j in 0 until dogResized.cols()) {
-//                    val pixel = dogResized.get(i, j)
-//                    if (pixel[3] > 20) { // Solo píxeles suficientemente opacos
-//                        val x = startX + j
-//                        val y = startY + i
-//                        if (y in 0 until mat.rows() && x in 0 until mat.cols()) {
-//                            mat.put(y, x, pixel[0], pixel[1], pixel[2], pixel[3]) // Incluir canal alfa
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        // Convertir de vuelta a Bitmap y asegurar el formato RGBA para la UI
-//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2RGB)
-//        Utils.matToBitmap(mat, bitmap)
-//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
-//        return bitmap
-//    }
+    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
+        // Convertir bitmap a Mat y cambiar a BGRA para manejar alfa desde el principio
+        val mat = Mat().apply {
+            Utils.bitmapToMat(bitmap, this)
+            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+        }
+
+        // Cargar el filtro de perrito y convertirlo directamente a BGRA
+        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+        val dogMat = Mat().apply {
+            Utils.bitmapToMat(dogBitmap, this)
+            Imgproc.cvtColor(this, this, Imgproc.COLOR_RGBA2BGRA)
+        }
+
+        // Detección de rostros en BGRA
+        val faces = MatOfRect()
+        cascadeClassifier.detectMultiScale(mat, faces, 1.1, 2, 2, Size(150.0, 150.0), Size())
+        val facesArray = faces.toArray()
+
+        // Aplicar filtro a cada cara detectada
+        facesArray.forEach { face ->
+            val dogResized = Mat()
+            Imgproc.resize(dogMat, dogResized, Size((face.width * 1.5).toInt().toDouble(), (face.height * 1.95).toInt().toDouble()))
+
+            val offsetX = (0.35 * face.width).toInt()
+            val offsetY = (0.375 * face.height).toInt()
+            val startX = face.x - offsetX
+            val startY = face.y - offsetY
+
+            for (i in 0 until dogResized.rows()) {
+                for (j in 0 until dogResized.cols()) {
+                    val pixel = dogResized.get(i, j)
+                    if (pixel[3] > 20) { // Solo píxeles suficientemente opacos
+                        val x = startX + j
+                        val y = startY + i
+                        if (y in 0 until mat.rows() && x in 0 until mat.cols()) {
+                            mat.put(y, x, pixel[0], pixel[1], pixel[2], pixel[3]) // Incluir canal alfa
+                        }
+                    }
+                }
+            }
+        }
+
+        // Convertir de vuelta a Bitmap y asegurar el formato RGBA para la UI
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2RGB)
+        Utils.matToBitmap(mat, bitmap)
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2RGBA)
+        return bitmap
+    }
 
 
 
@@ -1063,42 +1071,1169 @@ class OpenUtils {
 //    return bitmap
 //}
 
-    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
-        var mat = Mat()
+//    fun applyDogFilter(bitmap: Bitmap, cascadeClassifier: CascadeClassifier, context: Context): Bitmap {
+//        var mat = Mat()
+//        Utils.bitmapToMat(bitmap, mat)
+//        mat = CascadeRecado(mat, cascadeClassifier, context)
+//        Utils.matToBitmap(mat, bitmap)
+//        return bitmap
+//    }
+//
+//    private fun CascadeRecado(mat: Mat, cascadeClassifier: CascadeClassifier, context: Context): Mat {
+//        val mRgb = Mat()
+//        Imgproc.cvtColor(mat, mRgb, Imgproc.COLOR_RGBA2RGB)
+//
+//        val height = mRgb.height()
+//        var absoluteFaceSize: Double = height * 0.1
+//
+//        var faces: MatOfRect = MatOfRect()
+//        if(cascadeClassifier != null) {
+//            cascadeClassifier.detectMultiScale(mRgb, faces, 1.1, 2, 2, Size(absoluteFaceSize, absoluteFaceSize), Size())
+//        }
+//
+//        val facesArray: Array<Rect> = faces.toArray()
+//        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
+//        val dogMat = Mat()
+//        Utils.bitmapToMat(dogBitmap, dogMat)
+//        Imgproc.cvtColor(dogMat, dogMat, Imgproc.COLOR_RGBA2RGB)
+//
+//        for(i in facesArray.indices) {
+//            val face = facesArray[i]
+//            val dogResized = Mat()
+//            Imgproc.resize(dogMat, dogResized, Size(face.width.toDouble(), face.height.toDouble()))
+//
+//            dogResized.copyTo(mat.submat(face))
+//        }
+//
+//        return mat
+//    }
+
+    fun detectHarrisCorners(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val matGray = Mat()
+        val dest = Mat()
+        val matResult = Mat()
+
+        // Convert the bitmap to a Mat
         Utils.bitmapToMat(bitmap, mat)
-        mat = CascadeRecado(mat, cascadeClassifier, context)
-        Utils.matToBitmap(mat, bitmap)
+
+        // Convert to grayscale
+        Imgproc.cvtColor(mat, matGray, Imgproc.COLOR_RGB2GRAY)
+
+        // Convert image to float32
+        matGray.convertTo(matGray, CvType.CV_32F)
+
+        // Harris corner detection
+        Imgproc.cornerHarris(matGray, dest, 2, 5, 0.07)
+
+        // Dilate Harris corner result to enhance the corners
+        Imgproc.dilate(dest, dest, Mat())
+
+        // Create a mask where corners are detected
+        val mask = Mat()
+        Core.compare(dest, Scalar(0.01 * Core.minMaxLoc(dest).maxVal), mask, Core.CMP_GT)
+
+        // Convert original image to BGR (if needed)
+        Imgproc.cvtColor(mat, matResult, Imgproc.COLOR_RGB2BGR)
+
+        // Draw red corners on the original image
+        matResult.setTo(Scalar(0.0, 0.0, 255.0), mask)
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(matResult, bitmap)
+
+        // Release Mats
+        mat.release()
+        matGray.release()
+        dest.release()
+        matResult.release()
+        mask.release()
+
         return bitmap
     }
 
-    private fun CascadeRecado(mat: Mat, cascadeClassifier: CascadeClassifier, context: Context): Mat {
-        val mRgb = Mat()
-        Imgproc.cvtColor(mat, mRgb, Imgproc.COLOR_RGBA2RGB)
 
-        val height = mRgb.height()
-        var absoluteFaceSize: Double = height * 0.1
 
-        var faces: MatOfRect = MatOfRect()
-        if(cascadeClassifier != null) {
-            cascadeClassifier.detectMultiScale(mRgb, faces, 1.1, 2, 2, Size(absoluteFaceSize, absoluteFaceSize), Size())
-        }
 
-        val facesArray: Array<Rect> = faces.toArray()
-        val dogBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.dog)
-        val dogMat = Mat()
-        Utils.bitmapToMat(dogBitmap, dogMat)
-        Imgproc.cvtColor(dogMat, dogMat, Imgproc.COLOR_RGBA2RGB)
 
-        for(i in facesArray.indices) {
-            val face = facesArray[i]
-            val dogResized = Mat()
-            Imgproc.resize(dogMat, dogResized, Size(face.width.toDouble(), face.height.toDouble()))
 
-            dogResized.copyTo(mat.submat(face))
-        }
 
-        return mat
+
+
+
+
+
+
+
+
+
+
+    fun getFeatures(bitmap: Bitmap, detector: Feature2D): Bitmap {
+        val mat = Mat()
+        val grayMat = Mat()
+        val keypoints = MatOfKeyPoint()
+        val descriptors = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Convert to grayscale
+        Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY)
+
+        // Detect keypoints and compute descriptors
+        detector.detectAndCompute(grayMat, Mat(), keypoints, descriptors)
+
+        // Draw keypoints on the original image
+        val outputMat = Mat()
+        Features2d.drawKeypoints(mat, keypoints, outputMat, Scalar(51.0, 163.0, 236.0), Features2d.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(outputMat, bitmap)
+
+        // Release Mats
+        mat.release()
+        grayMat.release()
+        keypoints.release()
+        descriptors.release()
+        outputMat.release()
+
+        return bitmap
     }
+    fun filterSIFT(bitmap: Bitmap): Bitmap {
+        return try {
+            val sift = SIFT.create()
+            getFeatures(bitmap, sift)
+        } catch (e: Exception) {
+            bitmap  // Return unchanged bitmap in case of an error
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////Filtro que se usa
+    fun filterContours(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val grayMat = Mat()
+        val frame = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Convert to grayscale
+        Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY)
+
+        // Make a copy of the original frame
+        mat.copyTo(frame)
+
+        // Use various thresholds
+        val thresholds = listOf(15, 50, 100, 240)
+        for (threshold in thresholds) {
+            val thresh = Mat()
+
+            // Apply threshold
+            Imgproc.threshold(grayMat, thresh, threshold.toDouble(), 255.0, Imgproc.THRESH_BINARY)
+
+            // Find contours
+            val contours = ArrayList<MatOfPoint>()
+            val hierarchy = Mat()
+            Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE)
+
+            for (contour in contours) {
+                val mask = Mat.zeros(grayMat.size(), CvType.CV_8U)
+
+                // Create empty mask and fill it with white color
+                Imgproc.drawContours(mask, listOf(contour), 0, Scalar(255.0), -1)
+
+                // Find mean color inside mask
+                val mean = Core.mean(mat, mask)
+
+                // Draw frame with masked mean color
+                Imgproc.drawContours(frame, listOf(contour), 0, Scalar(mean.`val`[0], mean.`val`[1], mean.`val`[2], mean.`val`[3]), -1)
+            }
+
+            // Draw contours with black color
+            Imgproc.drawContours(frame, contours, -1, Scalar(0.0, 0.0, 0.0), 1)
+
+            // Release the threshold matrix
+            thresh.release()
+            hierarchy.release()
+        }
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(frame, bitmap)
+
+        // Release Mats
+        mat.release()
+        grayMat.release()
+        frame.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///////se usa
+    fun filterBlur(bitmap: Bitmap, blurType: String): Bitmap {
+        val mat = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        when (blurType) {
+            "gaussian" -> {
+                // Gaussian blur
+                Imgproc.GaussianBlur(mat, result, Size(29.0, 29.0), 0.0)
+            }
+            "median" -> {
+                // Median blur
+                Imgproc.medianBlur(mat, result, 29)
+            }
+            "classic" -> {
+                // Classic blur
+                Imgproc.blur(mat, result, Size(29.0, 29.0))
+            }
+            else -> {
+                // Default to classic blur if unknown type
+                Imgproc.blur(mat, result, Size(29.0, 29.0))
+            }
+        }
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(result, bitmap)
+
+        // Release Mats
+        mat.release()
+        result.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////se usa si o si
+    private var previousFrame: Mat? = null
+
+    fun filterMotion(bitmap: Bitmap): Bitmap {
+        val currentFrame = Mat()
+        val resultFrame = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, currentFrame)
+
+        // Convert current frame to grayscale
+        val grayCurrent = Mat()
+        Imgproc.cvtColor(currentFrame, grayCurrent, Imgproc.COLOR_RGB2GRAY)
+
+        if (previousFrame == null || previousFrame!!.size() != currentFrame.size()) {
+            // Remember the previous frame
+            previousFrame = currentFrame.clone()
+            // Return unchanged bitmap if no previous frame exists or sizes do not match
+            Utils.matToBitmap(currentFrame, bitmap)
+            currentFrame.release()
+            grayCurrent.release()
+            return bitmap
+        }
+
+        // Convert previous frame to grayscale
+        val grayPrevious = Mat()
+        Imgproc.cvtColor(previousFrame, grayPrevious, Imgproc.COLOR_RGB2GRAY)
+
+        // Get absolute difference between two frames
+        Core.absdiff(grayCurrent, grayPrevious, resultFrame)
+
+        // Update previous frame
+        previousFrame!!.release()
+        previousFrame = currentFrame.clone()
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(resultFrame, bitmap)
+
+        // Release Mats
+        currentFrame.release()
+        grayCurrent.release()
+        grayPrevious.release()
+        resultFrame.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////Puede ser pero no se
+
+    fun filterSkin(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val hsvMat = Mat()
+        val skinMask = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Convert to HSV
+        Imgproc.cvtColor(mat, hsvMat, Imgproc.COLOR_RGB2HSV)
+
+        // Define HSV range for skin tones
+        val lower = Scalar(0.0, 100.0, 0.0)
+        val upper = Scalar(50.0, 255.0, 255.0)
+
+        // Create skin mask
+        Core.inRange(hsvMat, lower, upper, skinMask)
+
+        // Apply Gaussian blur to the mask
+        Imgproc.GaussianBlur(skinMask, skinMask, Size(9.0, 9.0), 0.0)
+
+        // Create kernel for morphology operation
+        val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, Size(4.0, 4.0))
+
+        // Apply morphological CLOSE operation (dilate followed by erode)
+        Imgproc.morphologyEx(skinMask, skinMask, Imgproc.MORPH_CLOSE, kernel, Point(-1.0, -1.0), 3)
+
+        // Apply Gaussian blur again to the mask
+        Imgproc.GaussianBlur(skinMask, skinMask, Size(9.0, 9.0), 0.0)
+
+        // Apply the skin mask to the original image
+        Core.bitwise_and(mat, mat, result, skinMask)
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(result, bitmap)
+
+        // Release Mats
+        mat.release()
+        hsvMat.release()
+        skinMask.release()
+        result.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////No se que hace
+    private var affine: MutableMap<String, Any> = mutableMapOf()
+    private val affineStart: MutableMap<String, Any> = mutableMapOf(
+        "rotation" to 0.0,
+        "shift" to mutableListOf(0, 0)
+    )
+
+    fun checkPrevious(currentFrame: Mat) {
+        if (previousFrame == null || previousFrame!!.size() != currentFrame.size()) {
+            previousFrame = currentFrame.clone()
+            affine = HashMap(affineStart)  // deep copy starting affine values
+        }
+    }
+
+    fun filterAffine1(bitmap: Bitmap): Bitmap {
+        val currentFrame = Mat()
+        val resultFrame = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, currentFrame)
+
+        // Check previous frame for the first time
+        checkPrevious(currentFrame)
+
+        // Random rotation and shifts
+        val rotation = affine["rotation"] as Double
+        val shift = affine["shift"] as MutableList<Int>
+        affine["rotation"] = rotation + listOf(-1, 1).random().toDouble()
+        shift[0] += listOf(-1, 1).random()
+        shift[1] += listOf(-1, 1).random()
+
+        val rows = currentFrame.rows()
+        val cols = currentFrame.cols()
+        val halfX = cols / 2
+        val halfY = rows / 2
+
+        // Do not shift too far away
+        shift[0] = max(shift[0], -halfX)
+        shift[0] = min(shift[0], halfX)
+        shift[1] = max(shift[1], -halfY)
+        shift[1] = min(shift[1], halfY)
+
+        // Rotation 2D matrix
+        var m = Imgproc.getRotationMatrix2D(Point(halfX.toDouble(), halfY.toDouble()), affine["rotation"] as Double, 1.0)
+        Imgproc.warpAffine(currentFrame, resultFrame, m, Size(cols.toDouble(), rows.toDouble()))
+
+        // Shift matrix
+        m = Mat(2, 3, CvType.CV_32F)
+        m.put(0, 0, 1.0, 0.0, shift[0].toDouble())
+        m.put(1, 0, 0.0, 1.0, shift[1].toDouble())
+        Imgproc.warpAffine(resultFrame, resultFrame, m, Size(cols.toDouble(), rows.toDouble()))
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(resultFrame, bitmap)
+
+        // Release Mats
+        currentFrame.release()
+        resultFrame.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////Se usa
+
+    fun filterEqualize(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Split the image into its blue, green and red channels
+        val channels = ArrayList<Mat>(3)
+        Core.split(mat, channels)
+        val b = channels[0]
+        val g = channels[1]
+        val r = channels[2]
+
+        // Apply Histogram Equalization to each channel
+        val bEqualized = Mat()
+        val gEqualized = Mat()
+        val rEqualized = Mat()
+        Imgproc.equalizeHist(b, bEqualized)
+        Imgproc.equalizeHist(g, gEqualized)
+        Imgproc.equalizeHist(r, rEqualized)
+
+        // Merge the equalized channels back into one image
+        val equalizedChannels = ArrayList<Mat>(3)
+        equalizedChannels.add(bEqualized)
+        equalizedChannels.add(gEqualized)
+        equalizedChannels.add(rEqualized)
+        Core.merge(equalizedChannels, result)
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(result, bitmap)
+
+        // Release Mats
+        mat.release()
+        result.release()
+        b.release()
+        g.release()
+        r.release()
+        bEqualized.release()
+        gEqualized.release()
+        rEqualized.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////Se usa si o si
+    fun filterClahe(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Create a CLAHE object
+        val clahe = Imgproc.createCLAHE(10.0, Size(8.0, 8.0))
+
+        // Split the image into its blue, green and red channels
+        val channels = ArrayList<Mat>(3)
+        Core.split(mat, channels)
+        val b = channels[0]
+        val g = channels[1]
+        val r = channels[2]
+
+        // Apply CLAHE to each channel
+        val bClahe = Mat()
+        val gClahe = Mat()
+        val rClahe = Mat()
+        clahe.apply(b, bClahe)
+        clahe.apply(g, gClahe)
+        clahe.apply(r, rClahe)
+
+        // Merge the CLAHE applied channels back into one image
+        val claheChannels = ArrayList<Mat>(3)
+        claheChannels.add(bClahe)
+        claheChannels.add(gClahe)
+        claheChannels.add(rClahe)
+        Core.merge(claheChannels, result)
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(result, bitmap)
+
+        // Release Mats
+        mat.release()
+        result.release()
+        b.release()
+        g.release()
+        r.release()
+        bClahe.release()
+        gClahe.release()
+        rClahe.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+/////se usa
+    fun filterLab(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val labMat = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Convert image to LAB color model
+        Imgproc.cvtColor(mat, labMat, Imgproc.COLOR_RGB2Lab)
+
+        // Split the image into its L, A and B channels
+        val labChannels = ArrayList<Mat>(3)
+        Core.split(labMat, labChannels)
+        val l = labChannels[0]
+        val a = labChannels[1]
+        val b = labChannels[2]
+
+        // Create a CLAHE object
+        val clahe = Imgproc.createCLAHE(3.0, Size(8.0, 8.0))
+
+        // Apply CLAHE to L-channel
+        val lClahe = Mat()
+        clahe.apply(l, lClahe)
+
+        // Merge enhanced L-channel with the A and B channels
+        val claheChannels = ArrayList<Mat>(3)
+        claheChannels.add(lClahe)
+        claheChannels.add(a)
+        claheChannels.add(b)
+        Core.merge(claheChannels, labMat)
+
+        // Convert back to RGB color model
+        Imgproc.cvtColor(labMat, result, Imgproc.COLOR_Lab2RGB)
+
+        // Convert the result back to Bitmap
+        Utils.matToBitmap(result, bitmap)
+
+        // Release Mats
+        mat.release()
+        labMat.release()
+        result.release()
+        l.release()
+        a.release()
+        b.release()
+        lClahe.release()
+
+        return bitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    fun filterLaplacian(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val grayMat = Mat()
+        val laplacianMat = Mat()
+        val absLaplacianMat = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Convert to grayscale
+        Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY)
+
+        // Apply Laplacian filter with depth CV_64F
+        Imgproc.Laplacian(grayMat, laplacianMat, CvType.CV_64F)
+
+        // Convert the result to absolute values and then to CV_8U
+        Core.convertScaleAbs(laplacianMat, absLaplacianMat)
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(absLaplacianMat.cols(), absLaplacianMat.rows(), bitmap.config)
+        Utils.matToBitmap(absLaplacianMat, outputBitmap)
+
+        // Release Mats
+        mat.release()
+        grayMat.release()
+        laplacianMat.release()
+        absLaplacianMat.release()
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////se usa
+    fun filterSobelX(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val grayMat = Mat()
+        val sobelMat = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Convert to grayscale
+        Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY)
+
+        // Apply Sobel filter with ksize = -1 (Scharr filter)
+        Imgproc.Sobel(grayMat, sobelMat, CvType.CV_8U, 1, 0, -1)
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(sobelMat.cols(), sobelMat.rows(), bitmap.config)
+        Utils.matToBitmap(sobelMat, outputBitmap)
+
+        // Release Mats
+        mat.release()
+        grayMat.release()
+        sobelMat.release()
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////Se usa
+    fun filterSobelY(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val grayMat = Mat()
+        val sobelMat = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Convert to grayscale
+        Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY)
+
+        // Apply Sobel filter with ksize = -1 (Scharr filter) in the Y direction
+        Imgproc.Sobel(grayMat, sobelMat, CvType.CV_8U, 0, 1, -1)
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(sobelMat.cols(), sobelMat.rows(), bitmap.config)
+        Utils.matToBitmap(sobelMat, outputBitmap)
+
+        // Release Mats
+        mat.release()
+        grayMat.release()
+        sobelMat.release()
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+/////////// entra con los mejores
+    fun filter3Bits(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val result = Mat()
+        val mask = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Create a mask with the same size and type as the original image
+        mask.create(mat.size(), mat.type())
+        mask.setTo(Scalar(224.0, 224.0, 224.0)) // 224 = 11100000 in binary
+
+        // Leave the first three bits
+        Core.bitwise_and(mat, mask, result)
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(result.cols(), result.rows(), bitmap.config)
+        Utils.matToBitmap(result, outputBitmap)
+
+        // Release Mats
+        mat.release()
+        result.release()
+        mask.release()
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////buenisimo
+    fun filterMaxRgb(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Split the image into its BGR components
+        val channels = ArrayList<Mat>(3)
+        Core.split(mat, channels)
+        val b = channels[0]
+        val g = channels[1]
+        val r = channels[2]
+
+        // Find the maximum pixel intensity values for each (x, y)-coordinate
+        val max1 = Mat()
+        val max2 = Mat()
+        Core.max(r, g, max1)
+        Core.max(max1, b, max2)
+
+        // Create masks where the channels are less than the maximum
+        val maskR = Mat()
+        val maskG = Mat()
+        val maskB = Mat()
+        Core.compare(r, max2, maskR, Core.CMP_LT)
+        Core.compare(g, max2, maskG, Core.CMP_LT)
+        Core.compare(b, max2, maskB, Core.CMP_LT)
+
+        // Set all pixel values less than the maximum to zero
+        r.setTo(Scalar(0.0), maskR)
+        g.setTo(Scalar(0.0), maskG)
+        b.setTo(Scalar(0.0), maskB)
+
+        // Merge the channels back together and return the image
+        val resultChannels = ArrayList<Mat>(3)
+        resultChannels.add(b)
+        resultChannels.add(g)
+        resultChannels.add(r)
+        Core.merge(resultChannels, result)
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(result.cols(), result.rows(), bitmap.config)
+        Utils.matToBitmap(result, outputBitmap)
+
+        // Release Mats
+        mat.release()
+        result.release()
+        b.release()
+        g.release()
+        r.release()
+        max1.release()
+        max2.release()
+        maskR.release()
+        maskG.release()
+        maskB.release()
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////entra
+    fun filterChaoticRgb(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Create random values for each channel
+        val random = Random()
+        val bShift = random.nextInt(256) - 128
+        val gShift = random.nextInt(256) - 128
+        val rShift = random.nextInt(256) - 128
+
+        // Split the image into its BGR components
+        val channels = ArrayList<Mat>(3)
+        Core.split(mat, channels)
+        val b = channels[0]
+        val g = channels[1]
+        val r = channels[2]
+
+        // Convert channels to 32-bit signed integers
+        val bInt = Mat()
+        val gInt = Mat()
+        val rInt = Mat()
+        b.convertTo(bInt, CvType.CV_32SC1)
+        g.convertTo(gInt, CvType.CV_32SC1)
+        r.convertTo(rInt, CvType.CV_32SC1)
+
+        // Add random values to each channel
+        Core.add(bInt, Scalar(bShift.toDouble()), bInt)
+        Core.add(gInt, Scalar(gShift.toDouble()), gInt)
+        Core.add(rInt, Scalar(rShift.toDouble()), rInt)
+
+        // Clip values to the range [0, 255]
+        Core.max(bInt, Scalar(0.0), bInt)
+        Core.min(bInt, Scalar(255.0), bInt)
+        Core.max(gInt, Scalar(0.0), gInt)
+        Core.min(gInt, Scalar(255.0), gInt)
+        Core.max(rInt, Scalar(0.0), rInt)
+        Core.min(rInt, Scalar(255.0), rInt)
+
+        // Convert channels back to 8-bit unsigned integers
+        bInt.convertTo(b, CvType.CV_8UC1)
+        gInt.convertTo(g, CvType.CV_8UC1)
+        rInt.convertTo(r, CvType.CV_8UC1)
+
+        // Merge the channels back together and return the image
+        val resultChannels = ArrayList<Mat>(3)
+        resultChannels.add(b)
+        resultChannels.add(g)
+        resultChannels.add(r)
+        Core.merge(resultChannels, result)
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(result.cols(), result.rows(), bitmap.config)
+        Utils.matToBitmap(result, outputBitmap)
+
+        // Release Mats
+        mat.release()
+        result.release()
+        bInt.release()
+        gInt.release()
+        rInt.release()
+        b.release()
+        g.release()
+        r.release()
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+    fun filterSwapRgb(bitmap: Bitmap): Bitmap {
+        val mat = Mat()
+        val result = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Split the image into its BGR components
+        val channels = ArrayList<Mat>(3)
+        Core.split(mat, channels)
+
+        // Randomly shuffle color channels
+        Collections.shuffle(channels)
+
+        // Merge the shuffled channels back together and return the image
+        Core.merge(channels, result)
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(result.cols(), result.rows(), bitmap.config)
+        Utils.matToBitmap(result, outputBitmap)
+
+        // Release Mats
+        mat.release()
+        result.release()
+        for (channel in channels) {
+            channel.release()
+        }
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////Puede ser que entre
+
+    fun anonymizeFacePixelate(bitmap: Bitmap, blocks: Int = 5): Bitmap {
+        val mat = Mat()
+
+        // Convert Bitmap to Mat
+        Utils.bitmapToMat(bitmap, mat)
+
+        // Get the height and width of the image
+        val h = mat.rows()
+        val w = mat.cols()
+
+        // Compute the steps in the x and y directions
+        val xSteps = IntArray(blocks + 1) { i -> (i * w) / blocks }
+        val ySteps = IntArray(blocks + 1) { i -> (i * h) / blocks }
+
+        // Loop over the blocks in both the x and y direction
+        for (i in 1 until ySteps.size) {
+            for (j in 1 until xSteps.size) {
+                // Compute the starting and ending (x, y)-coordinates for the current block
+                val startX = xSteps[j - 1]
+                val startY = ySteps[i - 1]
+                val endX = xSteps[j]
+                val endY = ySteps[i]
+
+                // Extract the ROI using submat, compute the mean of the ROI,
+                // and then draw a rectangle with the mean RGB values over the ROI in the original image
+                val roi = mat.submat(startY, endY, startX, endX)
+                val meanColor = Core.mean(roi)
+                Imgproc.rectangle(mat, Point(startX.toDouble(), startY.toDouble()), Point(endX.toDouble(), endY.toDouble()), Scalar(meanColor.`val`[0], meanColor.`val`[1], meanColor.`val`[2]), -1)
+                roi.release()
+            }
+        }
+
+        // Convert the result back to Bitmap
+        val outputBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), bitmap.config)
+        Utils.matToBitmap(mat, outputBitmap)
+
+        // Release the Mat
+        mat.release()
+
+        return outputBitmap
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

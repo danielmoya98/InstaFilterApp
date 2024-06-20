@@ -257,7 +257,7 @@ class MainActivity : AppCompatActivity() {
                                     13 -> openUtils.processImage(bitmap)
                                     14 -> openUtils.blurBackground(bitmap, cascadeClassifier1)
                                     15 -> openUtils.cambiarColorIris(bitmap, cascadeClassifier_eye)
-                                    16 -> openUtils.cannyFiltroBlanco(bitmap)
+                                    16 -> openUtils.filterMotion(bitmap)
                                     else -> bitmap
                                 }
 
@@ -337,6 +337,7 @@ class MainActivity : AppCompatActivity() {
             outputStream?.close()
 
             // Llamar a la función para iniciar la otra actividad con la URI de la foto
+            filtroNum = 0
             startDisplayImageActivity(it)
         }
     }
