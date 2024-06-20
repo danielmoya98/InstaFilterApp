@@ -145,7 +145,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f2">
 
                     </ImageView>
 
@@ -163,7 +163,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f3">
 
                     </ImageView>
 
@@ -181,7 +181,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f4">
 
                     </ImageView>
 
@@ -199,7 +199,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f5">
 
                     </ImageView>
 
@@ -217,7 +217,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f6">
 
                     </ImageView>
 
@@ -235,7 +235,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f7">
 
                     </ImageView>
 
@@ -253,7 +253,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f8">
 
                     </ImageView>
 
@@ -271,7 +271,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f1">
+                        android:src="@drawable/f9">
 
                     </ImageView>
 
