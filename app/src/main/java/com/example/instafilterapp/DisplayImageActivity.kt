@@ -211,6 +211,9 @@ class DisplayImageActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+
+
+
         // Set onClickListener for the download button
         findViewById<View>(R.id.download_button).setOnClickListener {
             val success = ImageUtils.saveImageToGallery(this@DisplayImageActivity, imageView, "image_filename.png")
@@ -227,6 +230,8 @@ class DisplayImageActivity : AppCompatActivity() {
             ImageUtils.shareImageFromGallery(this@DisplayImageActivity, imagePath)
         }
     }
+
+
 
     private fun applyBrightnessChange(brightness: Int) {
         originalMat?.let {

@@ -72,6 +72,7 @@
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
+
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view_crop"
         android:layout_width="300dp"
@@ -87,12 +88,12 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal|center_vertical"
-            app:backgroundColor="@android:color/black"
-            app:longTickHeight="50dp"
+            app:backgroundColor="@color/black"
+            app:longTickHeight="25dp"
             app:pointerColor="@android:color/holo_blue_light"
             app:shortTickHeight="25dp"
             app:tickColor="@android:color/white"
-            app:tickSpacing="18dp" />
+            app:tickSpacing="20dp" />
 
         <SeekBar
             android:id="@+id/seekBar_crop"
@@ -114,20 +115,159 @@
         app:cardBackgroundColor="@android:color/black"
         app:cardCornerRadius="16dp">
 
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            tools:ignore="SpeakableTextPresentCheck">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_vertical">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="60dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="10dp">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/f1"
+                        android:scaleType="centerCrop">
+
+                    </ImageView>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
         <com.example.rulerview.RulerView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="70dp"
             android:layout_gravity="center_horizontal|center_vertical"
             app:backgroundColor="@android:color/black"
-            app:longTickHeight="50dp"
+            app:longTickHeight="25dp"
             app:pointerColor="@android:color/holo_blue_light"
             app:shortTickHeight="25dp"
+            android:visibility="gone"
             app:tickColor="@android:color/white"
-            app:tickSpacing="18dp" />
+            app:tickSpacing="20dp" />
 
         <SeekBar
             android:id="@+id/seekBar_filters"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:layout_height="52dp"
             android:layout_gravity="center_vertical|center_horizontal"
             android:max="100"
@@ -150,11 +290,11 @@
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal|center_vertical"
             app:backgroundColor="@android:color/black"
-            app:longTickHeight="50dp"
+            app:longTickHeight="25dp"
             app:pointerColor="@android:color/holo_blue_light"
             app:shortTickHeight="25dp"
             app:tickColor="@android:color/white"
-            app:tickSpacing="18dp" />
+            app:tickSpacing="20dp" />
 
         <SeekBar
             android:id="@+id/seekBar_rotate"
@@ -182,11 +322,11 @@
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal|center_vertical"
             app:backgroundColor="@android:color/black"
-            app:longTickHeight="50dp"
+            app:longTickHeight="25dp"
             app:pointerColor="@android:color/holo_blue_light"
             app:shortTickHeight="25dp"
             app:tickColor="@android:color/white"
-            app:tickSpacing="18dp" />
+            app:tickSpacing="20dp" />
 
         <SeekBar
             android:id="@+id/seekBar_brightness"
@@ -214,11 +354,11 @@
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal|center_vertical"
             app:backgroundColor="@android:color/black"
-            app:longTickHeight="50dp"
+            app:longTickHeight="25dp"
             app:pointerColor="@android:color/holo_blue_light"
             app:shortTickHeight="25dp"
             app:tickColor="@android:color/white"
-            app:tickSpacing="18dp" />
+            app:tickSpacing="20dp" />
 
         <SeekBar
             android:id="@+id/seekBar_raw"
@@ -246,11 +386,11 @@
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal|center_vertical"
             app:backgroundColor="@android:color/black"
-            app:longTickHeight="50dp"
+            app:longTickHeight="25dp"
             app:pointerColor="@android:color/holo_blue_light"
             app:shortTickHeight="25dp"
             app:tickColor="@android:color/white"
-            app:tickSpacing="18dp" />
+            app:tickSpacing="20dp" />
 
         <SeekBar
             android:id="@+id/seekBar_balance"
@@ -293,7 +433,7 @@
                     android:id="@+id/ll_crop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="75dp"
+                    android:layout_marginStart="150dp"
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
@@ -303,7 +443,7 @@
                         android:background="@drawable/rounded_button"
                         android:importantForAccessibility="no"
                         android:padding="5dp"
-                        android:src="@drawable/grid"
+                        android:src="@drawable/crop_24dp_fill0_wght400_grad0_opsz24"
                         app:tint="@color/black"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
@@ -386,7 +526,7 @@
                         android:background="@drawable/rounded_button"
                         android:importantForAccessibility="no"
                         android:padding="5dp"
-                        android:src="@drawable/grid"
+                        android:src="@drawable/brightness_6_24dp_fill0_wght400_grad0_opsz24"
                         app:tint="@color/black"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
@@ -412,7 +552,7 @@
                         android:background="@drawable/rounded_button"
                         android:importantForAccessibility="no"
                         android:padding="5dp"
-                        android:src="@drawable/grid"
+                        android:src="@drawable/contrast_24dp_fill0_wght400_grad0_opsz24"
                         app:tint="@color/black"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
@@ -420,7 +560,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Raw"
+                        android:text="Contraste"
                         android:textColor="@color/white"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -440,7 +580,7 @@
                         android:background="@drawable/rounded_button"
                         android:importantForAccessibility="no"
                         android:padding="5dp"
-                        android:src="@drawable/grid"
+                        android:src="@drawable/exposure_24dp_fill0_wght400_grad0_opsz24"
                         app:tint="@color/black"
                         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
@@ -448,7 +588,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Balance"
+                        android:text="Exposicion"
                         android:textColor="@color/white"
                         android:textSize="15sp" />
                 </LinearLayout>

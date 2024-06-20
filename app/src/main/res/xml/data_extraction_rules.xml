@@ -16,4 +16,12 @@
         <exclude .../>
     </device-transfer>
     -->
+    <!-- TODO:falta invertir camara. -->
+    <!-- TODO:funcionalidad de los filtros. -->
+    <!-- TODO:falta boton guardar imagen. -->
+    <!-- TODO:falta boton compartir. -->
+    <!-- TODO:falta boton flash. -->
+    <!-- TODO:falta blurview. -->
+    <!-- TODO:falta . -->
+
 </data-extraction-rules>
