@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="match_parent"
@@ -289,7 +287,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f10">
 
                     </ImageView>
 
@@ -306,7 +304,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f11">
 
                     </ImageView>
 
@@ -323,7 +321,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f12">
 
                     </ImageView>
 
@@ -340,7 +338,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f13">
 
                     </ImageView>
 
@@ -357,7 +355,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f14">
 
                     </ImageView>
 
@@ -374,7 +372,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f15">
 
                     </ImageView>
 
@@ -391,7 +389,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f16">
 
                     </ImageView>
 
@@ -408,7 +406,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f17">
 
                     </ImageView>
 
@@ -425,7 +423,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f18">
 
                     </ImageView>
 
@@ -442,7 +440,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f19">
 
                     </ImageView>
 
@@ -459,7 +457,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f20">
 
                     </ImageView>
 
@@ -476,7 +474,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/f9">
+                        android:src="@drawable/f21">
 
                     </ImageView>
 

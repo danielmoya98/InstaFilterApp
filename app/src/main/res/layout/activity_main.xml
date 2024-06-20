@@ -271,7 +271,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f10"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -291,7 +291,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f11"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -311,7 +311,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f12"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -331,7 +331,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f13"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -351,7 +351,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f14"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -371,7 +371,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f15"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -391,7 +391,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f16"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -411,7 +411,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f9"
+                        android:src="@drawable/f17"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
@@ -433,7 +433,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/f10"
+                        android:src="@drawable/f18"
                         tools:ignore="ContentDescription,ImageContrastCheck" />
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
