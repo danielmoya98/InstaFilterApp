@@ -1,7 +1,6 @@
 package com.example.instafilterapp
 
 import android.Manifest
-import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -26,19 +25,19 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
-import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.cardview.widget.CardView
 import com.example.instafilterapp.databinding.ActivityMainBinding
 import com.example.proyectopdi.OpenUtils
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import org.opencv.android.NativeCameraView
 import org.opencv.android.OpenCVLoader
 import org.opencv.objdetect.CascadeClassifier
@@ -83,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
 
         val toggleButton = findViewById<ImageButton>(R.id.toggle_button)
         val cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager

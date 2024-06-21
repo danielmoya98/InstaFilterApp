@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp"
     android:background="@color/black"
+    android:padding="0dp"
     tools:context=".MainActivity">
 
     <!--    <androidx.camera.view.PreviewView-->
@@ -24,10 +24,10 @@
 
     <RelativeLayout
         android:id="@+id/Relative"
-        android:background="@color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
+        android:background="@color/transparent">
+
         <TextView
             android:id="@+id/contador"
             android:layout_width="match_parent"
@@ -36,6 +36,7 @@
             android:textColor="@color/white"
             android:textSize="50sp"
             android:textStyle="bold">
+
         </TextView>
 
     </RelativeLayout>
@@ -90,7 +91,7 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f1"
                         tools:ignore="ContentDescription" />
                 </com.google.android.material.card.MaterialCardView>
@@ -110,11 +111,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f2"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_3"
                     android:layout_width="70dp"
@@ -130,11 +132,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f3"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_4"
                     android:layout_width="70dp"
@@ -150,11 +153,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f4"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_5"
                     android:layout_width="70dp"
@@ -170,11 +174,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f5"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_6"
                     android:layout_width="70dp"
@@ -190,11 +195,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f6"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_7"
                     android:layout_width="70dp"
@@ -210,11 +216,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f7"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_8"
                     android:layout_width="70dp"
@@ -230,11 +237,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f8"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_9"
                     android:layout_width="70dp"
@@ -250,11 +258,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f9"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_10"
                     android:layout_width="70dp"
@@ -270,11 +279,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f10"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_11"
                     android:layout_width="70dp"
@@ -290,11 +300,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f11"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_12"
                     android:layout_width="70dp"
@@ -310,11 +321,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f12"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_13"
                     android:layout_width="70dp"
@@ -330,11 +342,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f13"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_14"
                     android:layout_width="70dp"
@@ -350,11 +363,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f14"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_15"
                     android:layout_width="70dp"
@@ -370,11 +384,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f15"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_16"
                     android:layout_width="70dp"
@@ -390,11 +405,12 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f16"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_17"
                     android:layout_width="70dp"
@@ -410,13 +426,11 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f17"
                         tools:ignore="ContentDescription" />
 
                 </com.google.android.material.card.MaterialCardView>
-
-
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_view_18"
@@ -432,7 +446,7 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/f18"
                         tools:ignore="ContentDescription,ImageContrastCheck" />
                 </com.google.android.material.card.MaterialCardView>
@@ -560,7 +574,8 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="125dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:layout_alignParentTop="true"
         android:gravity="center_horizontal|center_vertical"
         android:orientation="horizontal">
@@ -569,45 +584,69 @@
             android:id="@+id/toggle_button"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:visibility="gone"
             android:layout_marginStart="25dp"
             android:background="@drawable/toggle_button_selector"
             android:importantForAccessibility="no"
+            android:visibility="gone"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/btnGrid"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-
-            android:background="@drawable/grid_on_24dp_fill0_wght200_grad0_opsz24"
-            android:importantForAccessibility="no"
-            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/glass_background">
 
-        <ImageButton
-            android:id="@+id/clock"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/button_selecton_timer"
-            android:importantForAccessibility="no"
-            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+                <ImageButton
+                    android:id="@+id/btnGrid"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="15dp"
+                    android:background="@drawable/grid_on_24dp_fill0_wght200_grad0_opsz24"
+                    android:importantForAccessibility="no"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+
+                <ImageButton
+                    android:id="@+id/clock"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="15dp"
+                    android:background="@drawable/button_selecton_timer"
+                    android:importantForAccessibility="no"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <ImageButton
+                    android:id="@+id/gallery_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="15dp"
+                    android:background="@drawable/gallery"
+                    android:importantForAccessibility="no"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <ImageButton
+                    android:id="@+id/rotar_camara"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="15dp"
+                    android:background="@drawable/flip_camera_android_24dp_fill0_wght400_grad0_opsz24"
+                    android:importantForAccessibility="no"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+            </LinearLayout>
+
+        </FrameLayout>
+
+
 
 
         <ImageButton
@@ -616,8 +655,8 @@
             android:layout_marginEnd="25dp"
             android:background="@drawable/arrow"
             android:importantForAccessibility="no"
-            android:visibility="gone"
             android:rotation="90"
+            android:visibility="gone"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     </LinearLayout>
@@ -632,28 +671,12 @@
         android:orientation="horizontal"
         tools:ignore="RtlHardcoded">
 
-        <ImageButton
-            android:id="@+id/gallery_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="25dp"
-            android:background="@drawable/gallery"
-            android:importantForAccessibility="no"
-            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
         <Space
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <ImageButton
-            android:id="@+id/rotar_camara"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="25dp"
-            android:background="@drawable/flip_camera_android_24dp_fill0_wght400_grad0_opsz24"
-            android:importantForAccessibility="no"
-            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     </LinearLayout>
 
