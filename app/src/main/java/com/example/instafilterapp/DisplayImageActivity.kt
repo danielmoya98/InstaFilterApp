@@ -35,7 +35,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class DisplayImageActivity : AppCompatActivity() {
-
     private lateinit var imageView: ImageView
     private lateinit var cardViewCrop: FrameLayout
     private lateinit var cardViewFilters: FrameLayout
@@ -46,36 +45,29 @@ class DisplayImageActivity : AppCompatActivity() {
     private val REQUEST_WRITE_EXTERNAL_STORAGE = 1
     private var saveImagePending = false
     private lateinit var seekBarBrightness: SeekBar
-
-    //    private lateinit var seekBarFilters: SeekBar
     private lateinit var seekBarRotate: SeekBar
     private lateinit var seekBarCrop: SeekBar
     private lateinit var seekBarRaw: SeekBar
     private lateinit var seekBarBalance: SeekBar
-
     private var originalMat: Mat? = null
     private lateinit var processedMat: Mat
     private lateinit var bitmap: Bitmap
-
     private var openUtils = OpenUtils()
     private lateinit var cascadeClassifier: CascadeClassifier
-
     lateinit var saveButton: ImageButton
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_image)
 
-        // Initialize OpenCV
+        // Inicializa OpenCV
         if (!OpenCVLoader.initDebug()) {
             Log.e("OpenCV", "OpenCV initialization failed")
-            // Handle initialization error if needed
+            // Maneja el error de inicialización si es necesario
         }
 
-        // Get view references
+        // Obtén las referencias de las vistas
         imageView = findViewById(R.id.image_view)
         seekBarBrightness = findViewById(R.id.seekBar_brightness)
-
         seekBarRotate = findViewById(R.id.seekBar_rotate)
         seekBarCrop = findViewById(R.id.seekBar_crop)
         seekBarRaw = findViewById(R.id.seekBar_raw)
@@ -88,10 +80,9 @@ class DisplayImageActivity : AppCompatActivity() {
         cardViewRaw = findViewById(R.id.card_view_raw)
         cardViewBalance = findViewById(R.id.card_view_balance)
 
-
         saveButton = findViewById(R.id.save_button)
 
-        // Initialize LinearLayouts
+        // Inicializa los LinearLayouts
         val llCrop: LinearLayout = findViewById(R.id.ll_crop)
         val llarrow: LinearLayout = findViewById(R.id.arrow_button)
         val llFilters: LinearLayout = findViewById(R.id.ll_filters)
@@ -99,12 +90,9 @@ class DisplayImageActivity : AppCompatActivity() {
         val llBrightness: LinearLayout = findViewById(R.id.ll_brightness)
         val llRaw: LinearLayout = findViewById(R.id.ll_raw)
 
-//        val llBalance: LinearLayout = findViewById(R.id.ll_balance)
+        // Botones para controlar la visibilidad del ScrollView horizontal
 
-        // Buttons to control the visibility of the horizontal ScrollView
-
-
-        // Set onClickListeners for toggling CardViews
+        // Establece onClickListeners para alternar los CardViews
         llCrop.setOnClickListener {
             toggleCardView(cardViewCrop)
         }
@@ -130,37 +118,31 @@ class DisplayImageActivity : AppCompatActivity() {
             toggleCardView(cardViewRaw)
         }
 
-//        llBalance.setOnClickListener {
-//            toggleCardView(cardViewBalance)
-//        }
         saveButton.setOnClickListener {
             guardarImage()
         }
 
-        // Set onClickListener for the back button to MainActivity
-
-
-        // Get the Uri of the selected image from MainActivity
+        // Obtén el Uri de la imagen seleccionada desde MainActivity
         val photoUriString = intent.getStringExtra("photoUri")
         val photoUri = Uri.parse(photoUriString)
 
-        // Display the image in ImageView
+        // Muestra la imagen en ImageView
         imageView.setImageURI(photoUri)
 
-        // Get the Uri of the selected Bitmap (if any)
+        // Obtén el Uri del Bitmap seleccionado (si existe)
         val imageUri: String? = intent.getStringExtra("imageUri")
 
-        // Decode and display the Bitmap in ImageView
+        // Decodifica y muestra el Bitmap en ImageView
         if (imageUri != null) {
             val uri = Uri.parse(imageUri)
             bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
             imageView.setImageBitmap(bitmap)
 
-            // Convert the Bitmap to the original matrix
+            // Convierte el Bitmap a la matriz original
             originalMat = Mat()
             Utils.bitmapToMat(bitmap, originalMat)
 
-            // Clone the original matrix to the processed matrix
+            // Clona la matriz original a la matriz procesada
             originalMat?.let {
                 processedMat = it.clone()
             } ?: run {
@@ -169,16 +151,15 @@ class DisplayImageActivity : AppCompatActivity() {
                 return
             }
         } else if (photoUriString != null) {
-            // There is a photoUri provided but no imageUri (Bitmap)
-//            Toast.makeText(this, "Loading image...", Toast.LENGTH_SHORT).show()
+            // Hay un photoUri proporcionado pero no imageUri (Bitmap)
             bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(photoUri))
             imageView.setImageBitmap(bitmap)
 
-            // Convert the Bitmap to the original matrix
+            // Convierte el Bitmap a la matriz original
             originalMat = Mat()
             Utils.bitmapToMat(bitmap, originalMat)
 
-            // Clone the original matrix to the processed matrix
+            // Clona la matriz original a la matriz procesada
             originalMat?.let {
                 processedMat = it.clone()
             } ?: run {
@@ -187,13 +168,13 @@ class DisplayImageActivity : AppCompatActivity() {
                 return
             }
         } else {
-            // No valid image to display
+            // No hay imagen válida para mostrar
             Toast.makeText(this, "No image to display", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Set SeekBarChangeListener for brightness
+        // Establece SeekBarChangeListener para el brillo
         seekBarBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (originalMat != null) {
@@ -205,7 +186,7 @@ class DisplayImageActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Set SeekBarChangeListener for filters
+        // Establece SeekBarChangeListener para los filtros
         seekBarCrop.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (originalMat != null) {
@@ -217,7 +198,7 @@ class DisplayImageActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Set SeekBarChangeListener for rotation
+        // Establece SeekBarChangeListener para la rotación
         seekBarRotate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (originalMat != null) {
@@ -229,12 +210,13 @@ class DisplayImageActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+        // Establece SeekBarChangeListener para el efecto de viñeta
         seekBarRaw.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (originalMat != null) {
-                    val intensity = progress / 100.0 // Convertir el progreso a un valor entre 0 y 1
+                    val intensity = progress / 100.0 // Convierte el progreso a un valor entre 0 y 1
                     val vignetteMat = applyVignetteEffect(originalMat!!, intensity)
-                    // Mostrar la imagen con el efecto de viñeta en tu vista de imagen
+                    // Muestra la imagen con el efecto de viñeta en la vista de imagen
                     val bitmap = Bitmap.createBitmap(
                         vignetteMat.cols(),
                         vignetteMat.rows(),
@@ -249,46 +231,28 @@ class DisplayImageActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Llama a esta función cuando el usuario haga clic en el botón de descarga
-//        findViewById<View>(R.id.download_button).setOnClickListener {
-//            if (ContextCompat.checkSelfPermission(
-//                    this,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-//                ) == PackageManager.PERMISSION_GRANTED
-//            ) {
-//                saveImage()
-//            } else {
-//                // Solicitar permisos si no están concedidos
-//                saveImagePending = true
-//                requestStoragePermission()
-//            }
-//        }
-
-
-
-        // Set onClickListener for the share button
+        // Establece onClickListener para el botón de compartir
         findViewById<View>(R.id.share_button).setOnClickListener {
-            // First, save the image to storage if it hasn't been saved yet
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                // If we don't have permission, request it
-                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+            // Primero, guarda la imagen en almacenamiento si no se ha guardado aún
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Si no tenemos permiso, solicítalo
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    REQUEST_WRITE_EXTERNAL_STORAGE
+                )
                 saveImagePending = true
             } else {
-                // Save the image and then share it
+                // Guarda la imagen y luego compártela
                 saveAndShareImage()
             }
         }
 
-
-
-
-
-
-
-
-
-
-
+        // Intenta cargar el archivo de cascada para detección de rostros
         try {
             val inputStream: InputStream =
                 resources.openRawResource(R.raw.haarcascade_frontalface_alt)
@@ -308,8 +272,6 @@ class DisplayImageActivity : AppCompatActivity() {
             Log.i(NativeCameraView.TAG, "Cascade file not found")
         }
     }
-
-
     private fun applyBrightnessChange(brightness: Int) {
         originalMat?.let {
             it.copyTo(processedMat)
@@ -340,17 +302,12 @@ class DisplayImageActivity : AppCompatActivity() {
         }
     }
 
-
-
-
-
-
     private fun updateImageViewFromMat(mat: Mat) {
-        // Convert the processed matrix to a bitmap
+        // Convertir la matriz procesada a un bitmap
         val resultBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(mat, resultBitmap)
 
-        // Set the bitmap in the imageView
+        // Establecer el bitmap en el imageView
         imageView.setImageBitmap(resultBitmap)
     }
 
@@ -376,141 +333,130 @@ class DisplayImageActivity : AppCompatActivity() {
         when (view.id) {
             R.id.cv1 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 imageView.setImageBitmap(bitmapMoment)
             }
 
             R.id.cv2 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterMotion(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv3 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.cannyFiltro(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv4 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyPixelize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv5 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyPosterize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv6 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applySepia(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv7 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applySobel(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv8 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.detectFace(bitmapMoment, cascadeClassifier)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv9 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.applyDogFilter(bitmapMoment, cascadeClassifier, this)
                 imageView.setImageBitmap(newBitmap)
             }
 
             R.id.cv10 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterContours(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv11 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterBlur(bitmapMoment, "")
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv12 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterSkin(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv13 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterEqualize(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv14 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterClahe(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv15 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterLab(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv16 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterSobelX(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv17 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterSobelY(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv18 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filter3Bits(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv19 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterMaxRgb(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv20 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.filterChaoticRgb(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
+
             R.id.cv21 -> {
                 var bitmapMoment = bitmap.copy(bitmap.config, true)
-//                var bitmapMoment = bitmap
                 var newBitmap = openUtils.anonymizeFacePixelate(bitmapMoment)
                 imageView.setImageBitmap(newBitmap)
             }
         }
     }
-
 
     private fun applyVignetteEffect(originalMat: Mat, intensity: Double): Mat {
         // Paso 1: Convertir la imagen original a escala de grises
@@ -542,28 +488,42 @@ class DisplayImageActivity : AppCompatActivity() {
         return result
     }
 
-
-
     private fun guardarImage() {
-        // Check if we have write permission
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            // If we don't have permission, request it
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_EXTERNAL_STORAGE)
+        // Verificar si tenemos permiso de escritura
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Si no tenemos permiso, solicitarlo
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                REQUEST_WRITE_EXTERNAL_STORAGE
+            )
         } else {
-            // Save the image
+            // Guardar la imagen
             saveImageToStorage()
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, save the image
+                // Permiso concedido, guardar la imagen
                 saveImageToStorage()
             } else {
-                // Permission denied, show a message to the user
-                Toast.makeText(this, "Write permission is required to save images", Toast.LENGTH_SHORT).show()
+                // Permiso denegado, mostrar un mensaje al usuario
+                Toast.makeText(
+                    this,
+                    "Se requiere permiso de escritura para guardar imágenes",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -581,7 +541,8 @@ class DisplayImageActivity : AppCompatActivity() {
             }
         }
 
-        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        val uri =
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
         uri?.let {
             val outputStream = contentResolver.openOutputStream(it)
             if (outputStream != null) {
@@ -589,14 +550,14 @@ class DisplayImageActivity : AppCompatActivity() {
             }
             outputStream?.close()
 
-            // Notify the gallery about the new image
+            // Notificar a la galería sobre la nueva imagen
             val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
             intent.data = uri
             sendBroadcast(intent)
 
-            Toast.makeText(this, "Image saved", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Imagen guardada", Toast.LENGTH_SHORT).show()
         } ?: run {
-            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Error al guardar la imagen", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -617,7 +578,8 @@ class DisplayImageActivity : AppCompatActivity() {
             }
         }
 
-        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+        val uri =
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
         uri?.let {
             val outputStream = contentResolver.openOutputStream(it)
             if (outputStream != null) {
@@ -625,15 +587,15 @@ class DisplayImageActivity : AppCompatActivity() {
             }
             outputStream?.close()
 
-            // Notify the gallery about the new image
+            // Notificar a la galería sobre la nueva imagen
             val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
             intent.data = uri
             sendBroadcast(intent)
 
-            // Share the image
+            // Compartir la imagen
             shareImage(uri)
         } ?: run {
-            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Error al guardar la imagen", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -643,7 +605,8 @@ class DisplayImageActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_STREAM, imageUri)
             type = "image/jpeg"
         }
-        startActivity(Intent.createChooser(shareIntent, "Share Image"))
+        startActivity(Intent.createChooser(shareIntent, "Compartir Imagen"))
     }
+
 }
 
