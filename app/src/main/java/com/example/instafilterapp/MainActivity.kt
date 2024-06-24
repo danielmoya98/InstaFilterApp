@@ -51,122 +51,97 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
+    // Vinculación con activity_main.xml
     private lateinit var viewBinding: ActivityMainBinding
 
+    // Envoltorios opcionales para captura de imagen y video
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
+
+    // Servicio de ejecución para operaciones de cámara en un hilo de fondo
     private lateinit var cameraExecutor: ExecutorService
+
+    // Envoltorio opcional para análisis de imagen
     private var imageAnalysis: ImageAnalysis? = null
+
+    // Instancia de clase de utilidad
     private var openUtils = OpenUtils()
 
+    // Clasificadores en cascada para detección de rostros y ojos
     private lateinit var cascadeClassifier: CascadeClassifier
     private lateinit var cascadeClassifier1: CascadeClassifier
     private lateinit var cascadeClassifier_eye: CascadeClassifier
 
+    // Componentes de la interfaz de usuario
     private lateinit var mImageButton: ImageButton
-    private var isScrollViewVisible = false
     private var contadorActivo = false
-    private var isFlashOn = false
 
-    private var lensFacing = CameraSelector.LENS_FACING_BACK
-    private lateinit var horizontalScrollView: HorizontalScrollView
+    // Configuraciones de filtro y rotación
     private var filtroNum: Int = 0
     private var rotar = CameraSelector.DEFAULT_FRONT_CAMERA
 
+    // TextView y botón de la interfaz de usuario
     private lateinit var contadorTextView: TextView
     private lateinit var clockButton: ImageButton
-    private var photoUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Infla y establece el diseño de la actividad principal
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-
-        val toggleButton = findViewById<ImageButton>(R.id.toggle_button)
-        val cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
-        val cameraId = cameraManager.cameraIdList[0]
-
+        // Verifica si todos los permisos han sido otorgados, de lo contrario, los solicita
         if (allPermissionsGranted()) {
             startCamera()
         } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
+        // Configura el botón de captura
         val captureButton: MaterialButton = findViewById(R.id.btn_capture)
-
-
-
         mImageButton = findViewById(R.id.toggle_button)
-
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        if (OpenCVLoader.initLocal()) {
-//            Toast.makeText(this, "load", Toast.LENGTH_SHORT).show()
-        } else {
-//            Toast.makeText(this, "fail", Toast.LENGTH_SHORT).show()
-        }
+        // Inicializa OpenCV localmente
+        OpenCVLoader.initLocal()
 
+        // Configura el botón de cuadrícula para alternar su visibilidad
         val btnGrid: ImageButton = findViewById(R.id.btnGrid)
         btnGrid.setOnClickListener {
             val gridOverlay: View = findViewById(R.id.gridOverlay)
-            if (gridOverlay.visibility == View.VISIBLE) {
-                gridOverlay.visibility = View.GONE
-            } else {
-                gridOverlay.visibility = View.VISIBLE
-            }
+            gridOverlay.visibility = if (gridOverlay.visibility == View.VISIBLE) View.GONE else View.VISIBLE
         }
 
         contadorTextView = findViewById(R.id.contador)
         clockButton = findViewById(R.id.clock)
-
         clockButton.setOnClickListener {
-            // Invierte el estado actual del ImageButton
             clockButton.isSelected = !clockButton.isSelected
-
-            if (clockButton.isSelected) {
-                // Cuando está activado
-                contadorActivo = true
-                Toast.makeText(this, "El contador está activado", Toast.LENGTH_SHORT).show()
-            } else {
-                // Cuando está desactivado
-                contadorActivo = false
-                Toast.makeText(this, "El contador está desactivado", Toast.LENGTH_SHORT).show()
-            }
+            contadorActivo = clockButton.isSelected
+            Toast.makeText(this, if (contadorActivo) "El contador está activado" else "El contador está desactivado", Toast.LENGTH_SHORT).show()
         }
 
-        toggleButton.setOnClickListener {
-            isFlashOn = !isFlashOn
-            toggleFlash(cameraManager, cameraId, isFlashOn)
-            toggleButton.isSelected = isFlashOn
-        }
-
+        // Botón para cambiar entre cámara frontal y trasera
         val rotateCameraButton: ImageButton = findViewById(R.id.rotar_camara)
-
         rotateCameraButton.setOnClickListener {
-            if (rotar == CameraSelector.DEFAULT_FRONT_CAMERA) {
-                rotar = CameraSelector.DEFAULT_BACK_CAMERA
-            } else {
-                rotar = CameraSelector.DEFAULT_FRONT_CAMERA
-            }
+            rotar = if (rotar == CameraSelector.DEFAULT_FRONT_CAMERA) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
             startCamera()
         }
 
         captureButton.setOnClickListener {
-            if(contadorActivo == false){
+            if (!contadorActivo) {
                 takePhoto()
-            }
-            else{
+            } else {
                 startCountdownAnimation()
                 contarTresSegundos()
             }
         }
 
+        // Botón para abrir la galería
         val galleryButton: ImageButton = findViewById(R.id.gallery_button)
         galleryButton.setOnClickListener { openGallery() }
 
+        // Carga e inicializa archivos de cascada para detección de rostros
         try {
             val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_alt)
             val cascadeDir: File = getDir("cascade", Context.MODE_PRIVATE)
@@ -179,70 +154,39 @@ class MainActivity : AppCompatActivity() {
             }
             inputStream.close()
             os.close()
-
             cascadeClassifier = CascadeClassifier(mCascadeFile.absolutePath)
         } catch (e: IOException) {
-            Log.i(NativeCameraView.TAG, "Cascade file not found")
-        }
-
-        try {
-            val inputStream: InputStream = resources.openRawResource(R.raw.haarcascade_frontalface_default)
-            val file: File = File(getDir("cascade", Context.MODE_PRIVATE), "haarcascade_frontalface_default.xml")
-            val fileOutputStream: FileOutputStream = FileOutputStream(file)
-
-            val data: ByteArray = ByteArray(4096)
-
-            var read_bytes: Int
-
-            while (inputStream.read(data).also { read_bytes = it } != -1) {
-                fileOutputStream.write(data, 0, read_bytes)
-            }
-            cascadeClassifier1 = CascadeClassifier(file.absolutePath)
-
-            inputStream.close()
-            fileOutputStream.close()
-            file.delete()
-
-        } catch (e: IOException) {
-            Log.i(NativeCameraView.TAG, "Cascade file not found")
-        }
-
-        try {
-            val inputStream2: InputStream = resources.openRawResource(R.raw.haarcascade_eye)
-            val cascadeDir: File = getDir("cascade", Context.MODE_PRIVATE)
-            val mCascadeFile_eye: File = File(cascadeDir, "haarcascade_eye.xml")
-            val os2: FileOutputStream = FileOutputStream(mCascadeFile_eye)
-            val buffer1: ByteArray = ByteArray(4096)
-            var byteRead1: Int
-            while (inputStream2.read(buffer1).also { byteRead1 = it } != -1) {
-                os2.write(buffer1, 0, byteRead1)
-            }
-            inputStream2.close()
-            os2.close()
-
-            cascadeClassifier_eye = CascadeClassifier(mCascadeFile_eye.absolutePath)
-        } catch (e: IOException) {
-            Log.i(NativeCameraView.TAG, "Cascade file not found")
+            Log.i(NativeCameraView.TAG, "Archivo de cascada no encontrado")
         }
     }
 
+
+    // Anotación para indicar el uso de características experimentales de la API CameraX
     @OptIn(ExperimentalGetImage::class)
     private fun startCamera() {
+        // Obtiene el proveedor de la cámara de forma asíncrona
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
+        // Agrega un listener que se ejecutará cuando el proveedor de cámara esté disponible
         cameraProviderFuture.addListener({
+            // Accede al proveedor de la cámara una vez que esté disponible
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
+            // Configura y construye el caso de uso para captura de imágenes
             imageCapture = ImageCapture.Builder().build()
 
+            // Configura y construye el caso de uso para análisis de imágenes
             imageAnalysis = ImageAnalysis.Builder()
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor) { image ->
+                        // Convierte la imagen capturada a un objeto Bitmap
                         val bitmap: Bitmap? = BitmapUtils.getBitmap(image)
 
+                        // Ejecuta operaciones en el hilo principal de la interfaz de usuario
                         runOnUiThread {
                             if (bitmap != null) {
+                                // Aplica un filtro según el número de filtro seleccionado
                                 var newBitmap = when (filtroNum) {
                                     1 -> openUtils.applyDogFilter(bitmap, cascadeClassifier, this)
                                     2 -> openUtils.variableThreshold(bitmap)
@@ -260,7 +204,6 @@ class MainActivity : AppCompatActivity() {
                                     14 -> openUtils.blurBackground(bitmap, cascadeClassifier1)
                                     15 -> openUtils.cambiarColorIris(bitmap, cascadeClassifier_eye)
                                     16 -> openUtils.filterMotion(bitmap)
-                                    /////////////////
                                     17 -> openUtils.filterContours(bitmap)
                                     18 -> openUtils.filterBlur(bitmap, "")
                                     19 -> openUtils.filterSkin(bitmap)
@@ -276,130 +219,115 @@ class MainActivity : AppCompatActivity() {
                                     else -> bitmap
                                 }
 
-
+                                // Si la cámara está configurada para la cámara frontal, espejea la imagen
                                 if(rotar == CameraSelector.DEFAULT_FRONT_CAMERA){
                                     newBitmap = Bitmap.createBitmap(newBitmap, 0, 0, newBitmap.width, newBitmap.height, Matrix().apply { postScale(-1f, 1f) }, true)
                                 }
 
+                                // Establece el bitmap en el ImageView del layout
                                 viewBinding.viewImage.setImageBitmap(newBitmap)
 
-                                // Guardamos el bitmap con el filtro aplicado en una variable global
+                                // Guarda el bitmap filtrado
                                 filteredBitmap = newBitmap
                             } else {
+                                // Registra un error si el bitmap es nulo
                                 Log.e(TAG, "El bitmap es nulo")
                             }
                         }
+                        // Cierra la imagen para liberar recursos
                         image.close()
                     }
                 }
 
+            // Establece el selector de la cámara basado en la configuración actual
             val cameraSelector = rotar
 
             try {
+                // Desvincula todos los casos de uso actuales y los vuelve a vincular
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, imageAnalysis, imageCapture)
             } catch (exc: Exception) {
+                // Registra un error si hay problemas al vincular los casos de uso
                 Log.e(TAG, "Error al vincular casos de uso", exc)
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
+    // Variable para almacenar el bitmap filtrado
     private var filteredBitmap: Bitmap? = null
 
     private fun takePhoto() {
+        // Obtiene el bitmap filtrado para guardar; si es nulo, termina la función
         val bitmapToSave = filteredBitmap ?: return
 
+        // Formatea el nombre del archivo con la fecha y hora actual
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            // Añade la ruta relativa si la versión de Android es posterior a Pie
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
             }
         }
 
+        // Inserta la imagen en el almacenamiento externo y obtiene una URI
         val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
         uri?.let {
+            // Abre un flujo de salida para guardar la imagen
             val outputStream = contentResolver.openOutputStream(it)
             if (outputStream != null) {
+                // Comprime y guarda la imagen en formato JPEG
                 bitmapToSave.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                outputStream?.close()
             }
-            outputStream?.close()
 
-            // Reproducir el sonido de la cámara
+            // Reproduce el sonido del obturador de la cámara
             playShutterSound()
 
-            // Llamar a la función para iniciar la otra actividad con la URI de la foto
+            // Resetea el número de filtro y inicia una actividad para mostrar la imagen
             filtroNum = 0
             startDisplayImageActivity(it)
         }
     }
 
+
+    // Método para reproducir el sonido del obturador de la cámara
     private fun playShutterSound() {
         val mediaPlayer = MediaPlayer.create(this, R.raw.camera)
-        mediaPlayer.start()
+        mediaPlayer.start()  // Inicia el sonido
         mediaPlayer.setOnCompletionListener {
-            it.release()
+            it.release()  // Libera el recurso una vez que el sonido ha terminado
         }
     }
+
+    // Método para iniciar una actividad que muestra una imagen a partir de su URI
     private fun startDisplayImageActivity(photoUri: Uri) {
         val intent = Intent(this, DisplayImageActivity::class.java)
-        intent.putExtra("photoUri", photoUri.toString())
-        startActivity(intent)
+        intent.putExtra("photoUri", photoUri.toString())  // Pasa la URI como extra
+        startActivity(intent)  // Inicia la actividad
     }
 
-
-    private fun getRearCameraId(cameraManager: CameraManager): String? {
-        try {
-            for (cameraId in cameraManager.cameraIdList) {
-                val characteristics = cameraManager.getCameraCharacteristics(cameraId)
-                val cameraFacing = characteristics.get(CameraCharacteristics.LENS_FACING)
-                if (cameraFacing != null && cameraFacing == CameraCharacteristics.LENS_FACING_BACK) {
-                    return cameraId
-                }
-            }
-        } catch (e: CameraAccessException) {
-            e.printStackTrace()
-        }
-        return null
-    }
-
-    private fun toggleFlash(cameraManager: CameraManager, cameraId: String?, turnOn: Boolean) {
-        if (cameraId != null) {
-            try {
-                cameraManager.setTorchMode(cameraId, turnOn)
-            } catch (e: CameraAccessException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun updateFlashIcon() {
-        val flashIcon = if (isFlashOn) {
-            R.drawable.fon
-        } else {
-            R.drawable.foff
-        }
-        mImageButton.setImageResource(flashIcon)
-    }
-
+    // Método para abrir la galería y seleccionar una imagen
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, 101)
+        startActivityForResult(intent, 101)  // Inicia una actividad con resultado para seleccionar una imagen
     }
 
+    // Método para verificar si todos los permisos necesarios han sido concedidos
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            baseContext, it) == PackageManager.PERMISSION_GRANTED
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
+    // Se llama cuando la actividad es destruida, se utiliza para cerrar recursos
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        cameraExecutor.shutdown()  // Cierra el executor de la cámara
     }
 
+    // Objeto companion que contiene constantes utilizadas en la clase
     companion object {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
@@ -410,41 +338,42 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.RECORD_AUDIO
             ).apply {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)  // Agrega permiso de escritura si es necesario
                 }
             }.toTypedArray()
     }
 
+    // Se llama cuando el usuario responde a la solicitud de permisos
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                startCamera()
+                startCamera()  // Inicia la cámara si todos los permisos fueron concedidos
             } else {
                 Toast.makeText(this,
                     "Permisos no concedidos por el usuario.",
                     Toast.LENGTH_SHORT).show()
-                finish()
+                finish()  // Cierra la aplicación si los permisos no fueron concedidos
             }
         }
     }
 
-
+    // Se llama cuando una actividad iniciada con startActivityForResult termina
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 101 && resultCode == RESULT_OK) {
-            val selectedImageUri: Uri? = data?.data
+            val selectedImageUri: Uri? = data?.data  // Obtiene la URI de la imagen seleccionada
             if (selectedImageUri != null) {
-                startDisplayImageActivity(selectedImageUri)
+                startDisplayImageActivity(selectedImageUri)  // Inicia la actividad para mostrar la imagen
             } else {
                 Toast.makeText(this, "No se ha seleccionado ninguna imagen", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-
+    // Gestiona los clics en las tarjetas que cambian el filtro de la imagen
     fun onCardClicked(view: View) {
         when (view.id) {
             R.id.card_view_1 -> filtroNum = 0
@@ -471,79 +400,60 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
-
+    // Inicia una animación de cuenta regresiva
     private fun startCountdownAnimation() {
         var count = 3
         contadorTextView.text = count.toString()
         contadorTextView.visibility = View.VISIBLE
-
-        // Animación fade in
         val fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
         fadeInAnimation.setAnimationListener(object : android.view.animation.Animation.AnimationListener {
-            override fun onAnimationStart(animation: android.view.animation.Animation?) {
-                // No es necesario implementar este método
-            }
-
+            override fun onAnimationStart(animation: android.view.animation.Animation?) {}
             override fun onAnimationEnd(animation: android.view.animation.Animation?) {
-                // Lógica para iniciar el conteo regresivo
-                countdown(count)
+                countdown(count)  // Inicia la cuenta regresiva al finalizar la animación
             }
-
-            override fun onAnimationRepeat(animation: android.view.animation.Animation?) {
-                // No es necesario implementar este método
-            }
+            override fun onAnimationRepeat(animation: android.view.animation.Animation?) {}
         })
         contadorTextView.startAnimation(fadeInAnimation)
     }
 
+    // Realiza la cuenta regresiva
     private fun countdown(count: Int) {
         var currentCount = count
-
         if (currentCount > 0) {
-            // Actualizar el texto del contador
             contadorTextView.text = currentCount.toString()
-
-            // Animación fade out
             val fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out)
             fadeOutAnimation.setAnimationListener(object : android.view.animation.Animation.AnimationListener {
-                override fun onAnimationStart(animation: android.view.animation.Animation?) {
-                    // No es necesario implementar este método
-                }
-
+                override fun onAnimationStart(animation: android.view.animation.Animation?) {}
                 override fun onAnimationEnd(animation: android.view.animation.Animation?) {
-                    // Llamar recursivamente para el siguiente número
-                    countdown(currentCount - 1)
+                    countdown(currentCount - 1)  // Continúa la cuenta regresiva
                 }
-
-                override fun onAnimationRepeat(animation: android.view.animation.Animation?) {
-                    // No es necesario implementar este método
-                }
+                override fun onAnimationRepeat(animation: android.view.animation.Animation?) {}
             })
             contadorTextView.startAnimation(fadeOutAnimation)
         } else {
-            // Ocultar el TextView cuando el conteo regresivo termina
-            contadorTextView.visibility = View.INVISIBLE
+            contadorTextView.visibility = View.INVISIBLE  // Oculta el contador al finalizar
         }
     }
 
-
+    // Contador de tres segundos antes de tomar una foto
     private fun contarTresSegundos() {
-        // Inicializar el contador con 3 segundos (3000 milisegundos)
         object : CountDownTimer(3000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                // Actualiza el UI con el tiempo restante si lo necesitas
-            }
-
+            override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish() {
-                // Cuando el contador termine, toma la foto
-                takePhoto()
+                takePhoto()  // Toma una foto al finalizar el contador
             }
         }.start()
     }
+
+
+
+
+
+
+
+
+
+
+
+
 }
